@@ -32,30 +32,30 @@ Revision History
 *******************************************************************************/
 //
 #define _mode  1
-#define _data  10
+#define _data  1 //0만 출력할거면 1로둬도된다
 #define _class 10
 #define SCALE  15
 
 //Convlayer #1 parameter
-#define N_C1 1
-#define M_C1 20
+#define N_C1 1 
+#define M_C1 20 // filter 갯수
 #define C_C1 1
-#define E_C1 24
-#define F_C1 24
-#define R_C1 5
-#define S_C1 5
-#define H_C1 28
-#define W_C1 28
+#define E_C1 24 // output size
+#define F_C1 24 // output size
+#define R_C1 5  // filter size
+#define S_C1 5  // filter size
+#define H_C1 28 // input size
+#define W_C1 28 // input size
 #define U_C1 1
 
 //Pool #1 parameter
 #define N_P1 1
-#define E_P1 12
+#define E_P1 12 //직접쓰는게 아닌 메모리할당을 위한 미리계산
 #define F_P1 12
-#define C_P1 20
+#define C_P1 20 
 #define M_P1 20
 
-//Convlayer #2 parameter
+//Convlaye #2 parameter
 #define N_C2 1
 #define M_C2 50
 #define C_C2 20

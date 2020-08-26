@@ -1,5 +1,6 @@
 void relu(short *ofmap, short *ifmap, int E, int F, int C)
-{
+{//activation function(어떤 값을 보내게 될때 일정값 이상이면 active)으로
+//rectified linear unit. sigmoid 대신에 쓰는것 0보다 작을땐 non-active 클때는 그값을 그대로반환
 	int c = 0, e = 0, f = 0;
 
 	for (c = 0; c<C; c++)
@@ -9,8 +10,8 @@ void relu(short *ofmap, short *ifmap, int E, int F, int C)
 			}
 }
 
-void pool(short *ofmap, short *ifmap, int E, int F, int C)
-{
+void pool(short *ofmap, short *ifmap, int E, int F, int C) //convolution을 거쳐서 나온 activation maps가 있을때 이를 이루는 convolution layer를 resizing 하여 새로운 layer를 얻는것
+{//convolution으로 feature가 많아짐으로 인한 overfitting을 방지하기 위해 pooling 해준다. mean pooling / max pooling
 	int c = 0, e = 0, f = 0, k = 0, l = 0;
 	short max = 0;
 	int _E = 0, _F = 0;
@@ -59,7 +60,9 @@ void convolution(short *ofmap, short *ifmap, short *fmap, unsigned int N, unsign
 }
 
 void bias(short *ofmap, short *ifmap, short *bias, unsigned int N, unsigned int M, unsigned int E, unsigned int F)
-{
+{//이 값이 높을수록 분류의 기준이 엄격하다는 것을 의미
+//높을수록 모델이 간단해지는 경향(변수가 적고 일반화) underfitting위험
+//작을수록 데이터의 허용범위가 넓어져 학습데이터에만 잘 들어맞는 모델이 만들어짐
 	unsigned int n = 0, m = 0, e = 0, f = 0;
 
 	// +Bias
