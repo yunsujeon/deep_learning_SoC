@@ -1,4 +1,4 @@
-#include <stdio.h> //
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 //#include <xtime_l.h>
@@ -9,7 +9,7 @@
 #include "cnn_func_float.h"
 //#include "benchmarking.h"
 //#include "benchmarking.c"
-//#include "address_map_arm.h"
+#include "address_map_arm.h"
 
 #define KEY_BASE              0xFF200050
 #define VIDEO_IN_BASE         0xFF203060
@@ -51,7 +51,6 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 		ifmap[i] = data[data_set][i]; //ifmap을 초기화시켜준다. data[0][i++] 로. 즉 입력된 숫자를 하나하나 불러오겠다는거
 	}
 
-
 	/////////////////////////////
 	//         Layer #1       //
 	////////////////////////////
@@ -79,6 +78,7 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	convolution_f(ofmap, ofmap6, fmap4_f, N_C4, C_C4, M_C4, F_C4, E_C4, R_C4, S_C4, H_C4, W_C4, U_C4); //6을가지고 conv 하여 ofmap을 초기화
 	bias_f(ofmap, ofmap, bias4_f, N_C4, M_C4, E_C4, F_C4); //생성된 ofmap을 bias타게함 최종적으로 ofmap 추출
 
+	//printf("%f", ofmap.size());
 	free(ofmap1); //할당한 메모리 비워주기
 	free(ofmap2);
 	free(ofmap3);
@@ -168,9 +168,11 @@ int main(void) {
 	float NSRdB = 0;
 	//////////////////////////////////////////////////////////////////////
 
-	/*int x, y;
+	/*
+	int x, y;
 	int push = 0;
-	int pixel_buf_ptr = *(int *)PIXEL_BUF_CTRL_BASE;
+	int pixel_buf_ptr = *(int *)PIXEL_BUF_CTRL_BASE; //int형 포인터로 변환한뒤 역참조한거
+
 	int pixel_ptr, row, col;
 	float input_data;
 
@@ -199,13 +201,14 @@ int main(void) {
 			}
 
 			//pixel data
-			for (row = 106; row <= 134; row++) {
-				for (col = 146; col <= 174; ++col) {
-					int i = 0;
+			int i = 0;
+			for (row = 106; row < 134; row++) {
+				for (col = 146; col < 174; ++col) {
 					pixel_ptr = pixel_buf_ptr + (row << 10) + (col << 1);
 					unsigned char color_val = *(unsigned char *)pixel_ptr;
 					//printf("%d  ", data);
-					if(color_val<150 && color_val>50) color_val = color_val - 50;
+					if(color_val<150 && color_val>50) 
+						color_val = color_val - 50;
 					input_data = 1-(float)color_val/255.0f;
 					//printf("%f  ", input_data);
 					data[0][i] = input_data;
@@ -215,8 +218,8 @@ int main(void) {
 				} printf("\n");
 			}
 		}
-	}*/
-
+	}
+	*/
 //////////////////////////////////////////////////////////
 /////                   START                        /////
 //////////////////////////////////////////////////////////
@@ -237,7 +240,7 @@ int main(void) {
 				ofmap_f = (float *)calloc(E_C4*F_C4*M_C4*N_C4,sizeof(float));
 				//"out" (1*1*10*1)
 
-
+				
 				cnn_ref(ofmap_f, ifmap_f, data_set); //oout in 시작번지 갖고들어감 data_set은 한번만 할거니깐 0번지
 				//ofmap_f 계산 완료하여 사용가능
 
@@ -246,26 +249,35 @@ int main(void) {
 				//     Classifiacation     //
 				////////////////////////////
 				for (int i = 0; i < H_C1 * W_C1; i++) {
-					printf("%f ", data[data_set][i]);
+					printf("%.3f ", data[data_set][i]);
 					if (i % 28 == 27)
 						printf("\n");
 				}
 
+				for (int i = 0; i < 10; i++) {
+					printf("%f ", ofmap_f[i]);
+				}
+
+				//printf("%f", ofmap_f.size());
 				//12/10 분석완료
 				max_val_f = ofmap_f[0];
 				data_index = 0;
 				for (n = 0; n<N_C4; n++) { //1
-					for (m = 0; m<M_C4; m++) { //10
+					for (m = 0; m<M_C4; m++) { //10 - 열개 (0~9) 비교하면서 가장 높은 값이 즉 그 m이 추출될거
 						for (e = 0; e<E_C4; e++) { //1
 							for (f = 0; f<F_C4; f++) { //1
 
+								//data_set=0 data_index=0~9
+								printf("%d\n ", ((n * M_C4 + m) * E_C4 + f) * F_C4 + e);
+								printf("%f\n ", ofmap_f[((n * M_C4 + m) * E_C4 + f) * F_C4 + e]);
 								ofmap_ref[data_set][data_index] = ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e];
+								printf("%f\n ", ofmap_ref[data_set][data_index]);
 								//this
 								//printf("ofmap_ref[%d][%d] : %d\n", data_set, data_index, ofmap_ref[data_set][data_index]);
 
-								if (ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e] >= max_val_f) {
-									max_val_f = ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e];
-									estimated_label = m;
+								if (ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e] >= max_val_f) { //추론결과가 max_val_f보다 크면 = 일치율이 높다면
+									max_val_f = ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e]; //max_val_f를 갱신해준다.
+									estimated_label = m; //그때의 m이 estimated_label이 될것
 									//printf("max_val_f: %d, estimated_label: %d\n", max_val_f, estimated_label);
 								}
 								data_index++;
