@@ -51,6 +51,7 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 		ifmap[i] = data[data_set][i]; //ifmap을 초기화시켜준다. data[0][i++] 로. 즉 입력된 숫자를 하나하나 불러오겠다는거
 	}
 
+	//레이어 수정해서 mnist 확률 높이기
 	/////////////////////////////
 	//         Layer #1       //
 	////////////////////////////
