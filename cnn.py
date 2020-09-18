@@ -345,6 +345,10 @@
 #
 
 
+
+
+
+
 from tensorflow.examples.tutorials.mnist import input_data
 import tensorflow as tf
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
@@ -425,7 +429,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 sess.run(tf.global_variables_initializer())
 
 #for i in range(20000):
-for i in range(500):
+for i in range(2000):
   batch = mnist.train.next_batch(50) #무작위로 선택된 50개의 데이터로 구성된 batch를 가져온다.
   if i%100 == 0:
     train_accuracy = accuracy.eval(feed_dict={x:batch[0], y_: batch[1], keep_prob: 1.0})
@@ -439,5 +443,7 @@ with open('C:/Users/dbstn/Desktop/weight_data.txt', 'w') as f:
     f.write(str(w_out))
 
 print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+
+
 
 
