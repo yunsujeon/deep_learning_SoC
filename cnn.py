@@ -349,101 +349,185 @@
 
 
 
-from tensorflow.examples.tutorials.mnist import input_data
+# from tensorflow.examples.tutorials.mnist import input_data
+# import tensorflow as tf
+# mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+# sess = tf.InteractiveSession()
+#
+# #입력될 이미지와 각각의 출력 클래스에 해당하는 노드를 생성하는 것. = 새로운 placeholder를 추가
+# x = tf.placeholder(tf.float32, shape=[None, 784])
+# y_ = tf.placeholder(tf.float32, shape=[None, 10])
+#
+# #가중치 W와 편향b를 정의한다.
+# W = tf.Variable(tf.zeros([784,10])) #둘다 0으로 된 텐서로 초기화를 한다. 이제부터 W와 b를 학습시켜나갈것
+# b = tf.Variable(tf.zeros([10]))
+#
+# #Variable들은 세션이 시작되기전에 초기화 되어야 한다.
+# sess.run(tf.global_variables_initializer())
+#
+# #각각의 클래스에 대한 소프트맥스 함수의 결과를 계산할 수 있다.
+# y = tf.nn.softmax(tf.matmul(x,W) + b)
+#
+# #사용된 이미지들 각각에서 계산된 합의 평균을 구하는 함수
+# cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
+#
+# #대칭성을 깨뜨리고 기울기가 0이 되는 것을 방지하기 위해 가중치에 약간의 잡음 (0.1)을 주어 초기화한다.
+# def weight_variable(shape):
+#   initial = tf.truncated_normal(shape, stddev=0.1)
+#   return tf.Variable(initial)
+#
+# #모델에 ReLU뉴런이 포함되므로 죽은 뉴런을 방지하기 위해 편향을 작은양수 0.1로 초기화해준다.
+# def bias_variable(shape):
+#   initial = tf.constant(0.1, shape=shape)
+#   return tf.Variable(initial)
+#
+# #스트라이드를 1로(필터가 이동할 간격), 출력크기가 입력과 같게 되도록 0으로 패딩하도록 설정함
+# #제로패딩 (1폭) 을하면 출력크기가 작아지지 않는다.
+# def conv2d(x, W):
+#   return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+#
+# #2*2 크기의 맥스풀링을 적용했다.
+# def max_pool_2x2(x):
+#   return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
+#                         strides=[1, 2, 2, 1], padding='SAME')
+#
+# W_conv1 = weight_variable([5, 5, 1, 32])
+# b_conv1 = bias_variable([32])
+# x_image = tf.reshape(x, [-1,28,28,1])
+# h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+# h_pool1 = max_pool_2x2(h_conv1)
+#
+# W_conv2 = weight_variable([5, 5, 32, 64])
+# b_conv2 = bias_variable([64])
+# h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
+# h_pool2 = max_pool_2x2(h_conv2)
+#
+# W_fc1 = weight_variable([7 * 7 * 64, 1024])
+# b_fc1 = bias_variable([1024])
+#
+# h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
+# h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+#
+# keep_prob = tf.placeholder(tf.float32)
+# h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+#
+# W_fc2 = weight_variable([1024, 10])
+# b_fc2 = bias_variable([10])
+#
+# y_conv=tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
+#
+# #####모델의 훈련 및 평가#####
+#
+# cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))
+# #학습비율 0.5로 경사하강법을 적용하여 크로스 엔트로피를 최소화하도록 하려면
+# #train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+#
+# train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+# correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
+# accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+# #학습을 실행시키기 전 작성한 변수들을 초기화 하는 작업
+# sess.run(tf.global_variables_initializer())
+#
+# #for i in range(20000):
+# for i in range(500):
+#   batch = mnist.train.next_batch(50) #무작위로 선택된 50개의 데이터로 구성된 batch를 가져온다.
+#   if i%100 == 0:
+#     train_accuracy = accuracy.eval(feed_dict={x:batch[0], y_: batch[1], keep_prob: 1.0})
+#     print("step %d, training accuracy %g"%(i, train_accuracy))
+#   #placeholder의 자리에 데이터를 넣을 수 있도록 train_step을 실행하여 배치 데이터를 넘긴다.
+#   train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+#
+# # with open('C:/Users/dbstn/Desktop/W1.txt', 'w') as f:
+# #   for i in range(1024):
+# #     w_out = sess.run(W_fc1[i])
+# #     f.write(str(w_out))
+# #
+# # with open('C:/Users/dbstn/Desktop/W2.txt', 'w') as f:
+# #   for i in range(1024):
+# #     w_out = sess.run(W_fc2[i])
+# #     f.write(str(w_out))
+# #
+# # with open('C:/Users/dbstn/Desktop/B1.txt', 'w') as f:
+# #   for i in range(1024):
+# #     w_out = sess.run(b_fc1[i])
+# #     f.write(str(w_out))
+# #
+# # with open('C:/Users/dbstn/Desktop/B2.txt', 'w') as f:
+# #   for i in range(1024):
+# #     w_out = sess.run(b_fc2[i])
+# #     f.write(str(w_out))
+#
+# print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+
+
+
 import tensorflow as tf
-mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+import matplotlib.pyplot as plt
+import random
+from tensorflow.examples.tutorials.mnist import input_data
+
+X = tf.placeholder(tf.float32, [None, 784])  # input, 784개의 값을 가지며 n개의 이미지이다.
+X_img = tf.reshape(X, [-1, 28, 28, 1])  # input 을 이미지로 인식하기 위해 reshape을 해준다. 28*28의 이미지이며 단일색상, 개수는 n개이므로 -1
+Y = tf.placeholder(tf.float32, [None, 10])  # output
+
+# layer 1
+W1 = tf.Variable(tf.random_normal([3, 3, 1, 32], stddev=0.1))  # 3*3크기의 필터, 색상은 단일, 총 32개의 필터
+L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1],
+                  padding='SAME')  # conv2d 를 통과해도 28*28 크기를 가짐, 대신 32개의 필터이므로 총 32개의 결과가 생김
+L1 = tf.nn.relu(L1)
+L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1],
+                    padding='SAME')  # max pooling을 하고 나면 스트라이드 및 패딩 설정에 의해 14*14크기의 결과가 나옴
+
+# layer 2
+# 이번에는 64개의 필터
+W2 = tf.Variable(tf.random_normal([3, 3, 32, 64], stddev=0.1))
+# conv2d layer를 통과시키면, [?,14,14,64] 형태를 가짐
+L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
+L2 = tf.nn.relu(L2)
+# max pooling 에서 stride가 2 이므로, 결과는 7 * 7 형태를 가질
+L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+# 이후 쭉 펼친다.
+L2 = tf.reshape(L2, [-1, 7 * 7 * 64])
+
+# fully-connected layer
+W3 = tf.get_variable("W3", shape=[7 * 7 * 64, 10], initializer=tf.contrib.layers.xavier_initializer())
+b = tf.Variable(tf.random_normal([10]))
+hypothesis = tf.matmul(L2, W3) + b
+
+cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis, labels=Y))
+optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
+
+# init
+# sess = tf.Session()
 sess = tf.InteractiveSession()
-
-#입력될 이미지와 각각의 출력 클래스에 해당하는 노드를 생성하는 것. = 새로운 placeholder를 추가
-x = tf.placeholder(tf.float32, shape=[None, 784])
-y_ = tf.placeholder(tf.float32, shape=[None, 10])
-
-#가중치 W와 편향b를 정의한다.
-W = tf.Variable(tf.zeros([784,10])) #둘다 0으로 된 텐서로 초기화를 한다. 이제부터 W와 b를 학습시켜나갈것
-b = tf.Variable(tf.zeros([10]))
-
-#Variable들은 세션이 시작되기전에 초기화 되어야 한다.
 sess.run(tf.global_variables_initializer())
+mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+# training_epochs = 15
+training_epochs=1
+batch_size = 100
 
-#각각의 클래스에 대한 소프트맥스 함수의 결과를 계산할 수 있다.
-y = tf.nn.softmax(tf.matmul(x,W) + b)
+# train
+print('Learning started. It takes sometimes.')
+for epoch in range(training_epochs):
+  avg_cost = 0
+  total_batch = int(mnist.train.num_examples / batch_size)
+  for i in range(total_batch):
+    batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+    feed_dict = {X: batch_xs, Y: batch_ys}
+    c, _, = sess.run([cost, optimizer], feed_dict=feed_dict)
+    avg_cost += c / total_batch
+  print("Epoch:", "%04d" % (epoch + 1), "cost =", "{:.9f}".format(avg_cost))
+print('Learning Finished!')
 
-#사용된 이미지들 각각에서 계산된 합의 평균을 구하는 함수
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
-
-#대칭성을 깨뜨리고 기울기가 0이 되는 것을 방지하기 위해 가중치에 약간의 잡음 (0.1)을 주어 초기화한다.
-def weight_variable(shape):
-  initial = tf.truncated_normal(shape, stddev=0.1)
-  return tf.Variable(initial)
-
-#모델에 ReLU뉴런이 포함되므로 죽은 뉴런을 방지하기 위해 편향을 작은양수 0.1로 초기화해준다.
-def bias_variable(shape):
-  initial = tf.constant(0.1, shape=shape)
-  return tf.Variable(initial)
-
-#스트라이드를 1로(필터가 이동할 간격), 출력크기가 입력과 같게 되도록 0으로 패딩하도록 설정함
-#제로패딩 (1폭) 을하면 출력크기가 작아지지 않는다.
-def conv2d(x, W):
-  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
-
-#2*2 크기의 맥스풀링을 적용했다.
-def max_pool_2x2(x):
-  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
-
-W_conv1 = weight_variable([5, 5, 1, 32])
-b_conv1 = bias_variable([32])
-x_image = tf.reshape(x, [-1,28,28,1])
-h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-h_pool1 = max_pool_2x2(h_conv1)
-
-W_conv2 = weight_variable([5, 5, 32, 64])
-b_conv2 = bias_variable([64])
-h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-h_pool2 = max_pool_2x2(h_conv2)
-
-W_fc1 = weight_variable([7 * 7 * 64, 1024])
-b_fc1 = bias_variable([1024])
-
-h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
-h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
-
-keep_prob = tf.placeholder(tf.float32)
-h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
-
-W_fc2 = weight_variable([1024, 10])
-b_fc2 = bias_variable([10])
-
-y_conv=tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
-
-#####모델의 훈련 및 평가#####
-
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y_conv), reduction_indices=[1]))
-#학습비율 0.5로 경사하강법을 적용하여 크로스 엔트로피를 최소화하도록 하려면
-#train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
-
-train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
-correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
+# Test
+correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.arg_max(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-#학습을 실행시키기 전 작성한 변수들을 초기화 하는 작업
-sess.run(tf.global_variables_initializer())
+print('Accuracy:', sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels}))
 
-#for i in range(20000):
-for i in range(2000):
-  batch = mnist.train.next_batch(50) #무작위로 선택된 50개의 데이터로 구성된 batch를 가져온다.
-  if i%100 == 0:
-    train_accuracy = accuracy.eval(feed_dict={x:batch[0], y_: batch[1], keep_prob: 1.0})
-    print("step %d, training accuracy %g"%(i, train_accuracy))
-  #placeholder의 자리에 데이터를 넣을 수 있도록 train_step을 실행하여 배치 데이터를 넘긴다.
-  train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
-
-with open('C:/Users/dbstn/Desktop/weight_data.txt', 'w') as f:
-  for i in range(1024):
-    w_out = sess.run(W_fc1[i])
-    f.write(str(w_out))
-
-print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
-
-
-
-
+with open('C:/Users/dbstn/Desktop/W1.txt', 'w') as f:
+  for a in range(3):
+    for b in range(3):
+      for c in range(1):
+        for d in range(32):
+          w_out = sess.run(W1[a][b][c][d])
+          f.write(str(w_out))
