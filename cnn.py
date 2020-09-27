@@ -508,7 +508,7 @@ mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 training_epochs=1
 batch_size = 100
 
-# train
+# training
 print('Learning started. It takes sometimes.')
 for epoch in range(training_epochs):
   avg_cost = 0
