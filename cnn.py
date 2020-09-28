@@ -472,29 +472,77 @@ X = tf.placeholder(tf.float32, [None, 784])  # input, 784개의 값을 가지며
 X_img = tf.reshape(X, [-1, 28, 28, 1])  # input 을 이미지로 인식하기 위해 reshape을 해준다. 28*28의 이미지이며 단일색상, 개수는 n개이므로 -1
 Y = tf.placeholder(tf.float32, [None, 10])  # output
 
+###########################기존 visual의 코드와 동일하게 레이어 구성##############################
+# # layer 1
+# W1 = tf.Variable(tf.random_normal([5, 5, 1, 20], stddev=0.1))  # 3*3크기의 필터, 색상은 단일, 총 32개의 필터
+# L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='VALID')
+# L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')  # 2*2의 크기를 2칸씩움직임 max pooling
+#
+# # layer 2
+# W2 = tf.Variable(tf.random_normal([5, 5, 20, 50], stddev=0.1))
+# L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='VALID')
+# L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
+#
+# # layer 3
+# W3 = tf.Variable(tf.random_normal([4, 4, 50, 500], stddev=0.1))
+# L3 = tf.nn.conv2d(L2, W3, strides=[1, 1, 1, 1], padding='VALID')
+# L3 = tf.nn.relu(L3)
+#
+# #layer 4 사실상 reshape
+# W4 = tf.Variable(tf.random_normal([1, 1, 500, 10], stddev=0.1))
+# L4 = tf.nn.conv2d(L3, W4, strides=[1, 1, 1, 1], padding='VALID')
+#
+# L4 = tf.reshape(L4, [-1, 1 * 1 * 10])
+#
+# W5 = tf.get_variable("W5", shape=[1 * 1 * 10, 10], initializer=tf.contrib.layers.xavier_initializer())
+#
+# b = tf.Variable(tf.random_normal([10]))
+# hypothesis = tf.matmul(L4, W5) + b
+
+
+
+###########################원래 layer 구성#########################
+# # layer 1
+# W1 = tf.Variable(tf.random_normal([3, 3, 1, 32], stddev=0.1))  # 3*3크기의 필터, 색상은 단일, 총 32개의 필터
+# L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='SAME')  # conv2d 를 통과해도 28*28 크기를 가짐, 대신 32개의 필터이므로 총 32개의 결과가 생김
+# L1 = tf.nn.relu(L1)
+# L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # max pooling을 하고 나면 스트라이드 및 패딩 설정에 의해 14*14크기의 결과가 나옴
+#
+# # layer 2
+# W2 = tf.Variable(tf.random_normal([3, 3, 32, 64], stddev=0.1))
+# L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
+# L2 = tf.nn.relu(L2)
+# L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+# L2 = tf.reshape(L2, [-1, 7 * 7 * 64])
+#
+# # fully-connected layer
+# W3 = tf.get_variable("W3", shape=[7 * 7 * 64, 10], initializer=tf.contrib.layers.xavier_initializer())
+#
+# b = tf.Variable(tf.random_normal([10]))
+# hypothesis = tf.matmul(L2, W3) + b
+
+
+######################필터수를 줄인 레이어구성################################
 # layer 1
-W1 = tf.Variable(tf.random_normal([3, 3, 1, 32], stddev=0.1))  # 3*3크기의 필터, 색상은 단일, 총 32개의 필터
-L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1],
-                  padding='SAME')  # conv2d 를 통과해도 28*28 크기를 가짐, 대신 32개의 필터이므로 총 32개의 결과가 생김
-L1 = tf.nn.relu(L1)
-L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1],
-                    padding='SAME')  # max pooling을 하고 나면 스트라이드 및 패딩 설정에 의해 14*14크기의 결과가 나옴
+W1 = tf.Variable(tf.random_normal([5, 5, 1, 20], stddev=0.1))  # 3*3크기의 필터, 색상은 단일, 총 32개의 필터
+L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='VALID')  # conv2d 를 통과해도 28*28 크기를 가짐, 대신 32개의 필터이므로 총 32개의 결과가 생김
+L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')  # max pooling을 하고 나면 스트라이드 및 패딩 설정에 의해 14*14크기의 결과가 나옴
 
 # layer 2
-# 이번에는 64개의 필터
-W2 = tf.Variable(tf.random_normal([3, 3, 32, 64], stddev=0.1))
-# conv2d layer를 통과시키면, [?,14,14,64] 형태를 가짐
-L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
+W2 = tf.Variable(tf.random_normal([3, 3, 20, 50], stddev=0.1))
+L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='VALID')
 L2 = tf.nn.relu(L2)
-# max pooling 에서 stride가 2 이므로, 결과는 7 * 7 형태를 가질
-L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-# 이후 쭉 펼친다.
-L2 = tf.reshape(L2, [-1, 7 * 7 * 64])
+L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
 
-# fully-connected layer
-W3 = tf.get_variable("W3", shape=[7 * 7 * 64, 10], initializer=tf.contrib.layers.xavier_initializer())
+#flatten
+L2 = tf.reshape(L2, [-1, 5 * 5 * 50])
+
+#fully connected layer
+W3 = tf.get_variable("W3", shape=[5 * 5 * 50, 10], initializer=tf.contrib.layers.xavier_initializer())
+
 b = tf.Variable(tf.random_normal([10]))
 hypothesis = tf.matmul(L2, W3) + b
+
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=hypothesis, labels=Y))
 optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
@@ -504,15 +552,17 @@ optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
 sess = tf.InteractiveSession()
 sess.run(tf.global_variables_initializer())
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-# training_epochs = 15
-training_epochs=1
+training_epochs = 15
 batch_size = 100
 
 # training
 print('Learning started. It takes sometimes.')
 for epoch in range(training_epochs):
   avg_cost = 0
-  total_batch = int(mnist.train.num_examples / batch_size)
+  total_batch = int(mnist.train.num_examples / batch_size) #mnist.train.num_examples = 55000이고 batch_size=100이니 550개 학습한다보면된다
+  # 1 iteration 마다 100개의 데이터에 대해서 학습한다고 보면된다
+  # 1epoch = 총 데이터갯수 / batchsize = 550일것 = iteration = 550
+  #근데 여기서는 epochs를 정해준듯??? 다시보기
   for i in range(total_batch):
     batch_xs, batch_ys = mnist.train.next_batch(batch_size)
     feed_dict = {X: batch_xs, Y: batch_ys}
@@ -526,10 +576,43 @@ correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.arg_max(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 print('Accuracy:', sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels}))
 
+with open('C:/Users/dbstn/Desktop/bias.txt', 'w') as f:
+  for a in range(10):
+    b_out = sess.run(b[a])
+    b_out = (str(b_out) + ', ')
+    f.write(str(b_out))
+    print ( "bias추출을 ", a+1 , "번 완료했습니다.")
+
+count1 = 0
+count2 = 0
+count3 = 0
 with open('C:/Users/dbstn/Desktop/W1.txt', 'w') as f:
+  for a in range(5):
+    for b in range(5):
+      for c in range(1):
+        for d in range(20):
+          w_out1 = sess.run(W1[a][b][c][d])
+          w_out1 = (str(w_out1)+', ')
+          f.write(str(w_out1))
+          count1 = count1 +1
+          print("W1추출을 ",count1, "/500 번 완료했습니다.")
+
+with open('C:/Users/dbstn/Desktop/W2.txt', 'w') as f:
   for a in range(3):
     for b in range(3):
-      for c in range(1):
-        for d in range(32):
-          w_out = sess.run(W1[a][b][c][d])
-          f.write(str(w_out))
+      for c in range(20):
+        for d in range(50):
+          w_out2 = sess.run(W2[a][b][c][d])
+          w_out2 = (str(w_out2)+', ')
+          f.write(str(w_out2))
+          count2 = count2 +1
+          print("W2추출을 ", count2, "/9000 번 완료했습니다.")
+
+with open('C:/Users/dbstn/Desktop/W3.txt', 'w') as f:
+  for a in range(1250):
+    for b in range(10):
+      w_out3 = sess.run(W3[a][b])
+      w_out3 = (str(w_out3)+', ')
+      f.write(str(w_out3))
+      count3 = count3 +1
+      print("W3추출을 ", count3, "/12500 번 완료했습니다.")

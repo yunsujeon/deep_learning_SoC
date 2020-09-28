@@ -44,14 +44,7 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	float* ofmap3 = (float*)calloc(E_C2 * F_C2 * M_C2 * N_C2, sizeof(float));
 	float* ofmap4 = (float*)calloc(E_R1 * F_R1 * M_R1 * N_R1, sizeof(float));
 	float* ofmap5 = (float*)calloc(E_P2 * F_P2 * C_P2 * N_P2, sizeof(float));
-
-
-	float *ofmap1 = (float *) calloc(E_C1*F_C1*M_C1*N_C1, sizeof(float));
-	float *ofmap2 = (float *) calloc(E_P1*F_P1*C_P1*N_P1, sizeof(float));
-	float *ofmap3 = (float *) calloc(E_C2*F_C2*M_C2*N_C2, sizeof(float));
-	float *ofmap4 = (float *) calloc(E_P2*F_P2*C_P2*N_P2, sizeof(float));
-	float *ofmap5 = (float *) calloc(E_C3*F_C3*M_C3*N_C3, sizeof(float));
-	float *ofmap6 = (float *) calloc(E_R1*F_R1*M_R1*N_R1, sizeof(float));
+	float* ofmap6 = (float*)calloc();
 
 	//Input mapping
 	for (i = 0; i<H_C1*W_C1; i++) { //inputsize 28*28만큼.
@@ -74,14 +67,18 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	/////////////////////////////
 	//         Layer #3       // reshape를 위한 Layer
 	////////////////////////////
-	convolution_f(ofmap, ofmap5, fmap3_f, N_C3, C_C3, M_C3, F_C3, E_C3, R_C3, S_C3, H_C3, W_C3, U_C3); // W3 사용
-	bias_f(ofmap, ofmap, bias1_f, N_C3, M_C3, E_C3, F_C3); // bias 사용
+	convolution_f(ofmap6, ofmap5, fmap3_f, N_C3, C_C3, M_C3, F_C3, E_C3, R_C3, S_C3, H_C3, W_C3, U_C3); // W3 사용
+
+	fullyconnected(ofmap, ofmap6, fmap4_f, ); //W4를 사용하여 fullyconnected를 만들어준다.
+	bias_f(ofmap, ofmap, bias1_f, N_C3, M_C3, E_C3, F_C3); // 이후 bias를 더해주어 가설 완성
+	//ofmap은 10의 크기로 출력될것이다.
 
 	free(ofmap1); //할당한 메모리 비워주기
 	free(ofmap2);
 	free(ofmap3);
 	free(ofmap4);
 	free(ofmap5);
+	free(ofmap6);
 }
 /*
 void cnn_opt(short *ofmap, short *ifmap, int data_set){
