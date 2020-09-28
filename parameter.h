@@ -33,7 +33,7 @@ Revision History
 //
 #define _mode  1
 #define _data  1 //0만 출력할거면 1로둬도된다
-#define _class 10
+#define _class 10 //mnist 숫자니깐 10개의 출력을 나타내게된다.
 #define SCALE  15
 
 //Convlayer #1 parameter
@@ -59,37 +59,37 @@ Revision History
 #define N_C2 1
 #define M_C2 50
 #define C_C2 20
-#define E_C2 8
-#define F_C2 8
-#define R_C2 5
-#define S_C2 5
+#define E_C2 10
+#define F_C2 10
+#define R_C2 3
+#define S_C2 3
 #define H_C2 12
 #define W_C2 12
 #define U_C2 1
 
 //Pool #2 parameter
 #define N_P2 1
-#define E_P2 4
-#define F_P2 4
+#define E_P2 5
+#define F_P2 5
 #define C_P2 50
 #define M_P2 50
 
 //Convlayer #3 parameter
 #define N_C3 1
-#define M_C3 500
+#define M_C3 10
 #define C_C3 50
 #define E_C3 1
 #define F_C3 1
-#define R_C3 4
-#define S_C3 4
-#define H_C3 4
-#define W_C3 4
+#define R_C3 5
+#define S_C3 5
+#define H_C3 5
+#define W_C3 5
 #define U_C3 1
 
 //ReLU #1 parameter
 #define N_R1 1
-#define M_R1 500
-#define C_R1 50
+#define M_R1 50
+#define C_R1 20
 #define E_R1 1
 #define F_R1 1
 #define R_R1 4
@@ -98,26 +98,4 @@ Revision History
 #define W_R1 4
 #define U_R1 1
 
-//Convlayer #4 parameter
-#define N_C4 1
-#define M_C4 10
-#define C_C4 500
-#define E_C4 1
-#define F_C4 1
-#define R_C4 1
-#define S_C4 1
-#define H_C4 1
-#define W_C4 1
-#define U_C4 1
 
-//Softmax #1 parameter
-#define N_S1 1
-#define M_S1 10
-#define C_S1 500
-#define E_S1 1
-#define F_S1 1
-#define R_S1 1
-#define S_S1 1
-#define H_S1 1
-#define W_S1 1
-#define U_S1 1

@@ -39,7 +39,14 @@ unsigned int validator_dummy(unsigned int uiParam0, unsigned int uiParam1, unsig
 void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	int i = 0;
 
-	float *ofmap1 = (float *) calloc(E_C1*F_C1*M_C1*N_C1, sizeof(float)); //메모리할당
+	float* ofmap1 = (float*)calloc(E_C1 * F_C1 * M_C1 * N_C1, sizeof(float));
+	float* ofmap2 = (float*)calloc(E_P1 * F_P1 * C_P1 * N_P1, sizeof(float));
+	float* ofmap3 = (float*)calloc(E_C2 * F_C2 * M_C2 * N_C2, sizeof(float));
+	float* ofmap4 = (float*)calloc(E_R1 * F_R1 * M_R1 * N_R1, sizeof(float));
+	float* ofmap5 = (float*)calloc(E_P2 * F_P2 * C_P2 * N_P2, sizeof(float));
+
+
+	float *ofmap1 = (float *) calloc(E_C1*F_C1*M_C1*N_C1, sizeof(float));
 	float *ofmap2 = (float *) calloc(E_P1*F_P1*C_P1*N_P1, sizeof(float));
 	float *ofmap3 = (float *) calloc(E_C2*F_C2*M_C2*N_C2, sizeof(float));
 	float *ofmap4 = (float *) calloc(E_P2*F_P2*C_P2*N_P2, sizeof(float));
@@ -47,45 +54,34 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	float *ofmap6 = (float *) calloc(E_R1*F_R1*M_R1*N_R1, sizeof(float));
 
 	//Input mapping
-	for (i = 0; i<H_C1*W_C1; i++) { //inputsize 28*28만큼
+	for (i = 0; i<H_C1*W_C1; i++) { //inputsize 28*28만큼.
 		ifmap[i] = data[data_set][i]; //ifmap을 초기화시켜준다. data[0][i++] 로. 즉 입력된 숫자를 하나하나 불러오겠다는거
 	}
 
-	//레이어 수정해서 mnist 확률 높이기
 	/////////////////////////////
 	//         Layer #1       //
 	////////////////////////////
-	convolution_f(ofmap1, ifmap, fmap1_f, N_C1, C_C1, M_C1, F_C1, E_C1, R_C1, S_C1, H_C1, W_C1, U_C1); //ifmap이 들어감 ofmap생성 fmap1_f는 정해진값
-	bias_f(ofmap1, ofmap1, bias1_f, N_C1, M_C1, E_C1, F_C1); //bias parameter에 의해 ofmap 변환되어나옴
-	pool_f(ofmap2, ofmap1, E_C1, F_C1, M_C1); //ofmap1이 들어가서 pool에 의해 잘려서 ofmap2생성
+	convolution_f(ofmap1, ifmap, fmap1_f, N_C1, C_C1, M_C1, F_C1, E_C1, R_C1, S_C1, H_C1, W_C1, U_C1); // W1 사용
+	pool_f(ofmap2, ofmap1, E_C1, F_C1, M_C1); 
 
 	/////////////////////////////
 	//         Layer #2       //
 	////////////////////////////
-	convolution_f(ofmap3, ofmap2, fmap2_f, N_C2, C_C2, M_C2, F_C2, E_C2, R_C2, S_C2, H_C2, W_C2, U_C2); //ofmap3생성
-	bias_f(ofmap3, ofmap3, bias2_f, N_C2, M_C2, E_C2, F_C2); //ofmap3
-	pool_f(ofmap4, ofmap3, E_C2, F_C2, M_C2); //ofmap4생성
+	convolution_f(ofmap3, ofmap2, fmap2_f, N_C2, C_C2, M_C2, F_C2, E_C2, R_C2, S_C2, H_C2, W_C2, U_C2); // W2 사용
+	relu_f(ofmap4, ofmap3, E_C2, F_C2, M_C2); 
+	pool_f(ofmap5, ofmap4, E_C2, F_C2, M_C2);
 
 	/////////////////////////////
-	//         Layer #3       //
+	//         Layer #3       // reshape를 위한 Layer
 	////////////////////////////
-	convolution_f(ofmap5, ofmap4, fmap3_f, N_C3, C_C3, M_C3, F_C3, E_C3, R_C3, S_C3, H_C3, W_C3, U_C3); //ofmap5생성
-	bias_f(ofmap5, ofmap5, bias3_f, N_C3, M_C3, E_C3, F_C3); //ofmap5생성
-	relu_f(ofmap6, ofmap5, E_C3, F_C3, M_C3); //relu로 ofmap6생성
+	convolution_f(ofmap, ofmap5, fmap3_f, N_C3, C_C3, M_C3, F_C3, E_C3, R_C3, S_C3, H_C3, W_C3, U_C3); // W3 사용
+	bias_f(ofmap, ofmap, bias1_f, N_C3, M_C3, E_C3, F_C3); // bias 사용
 
-	/////////////////////////////
-	//         Layer #4       //
-	////////////////////////////
-	convolution_f(ofmap, ofmap6, fmap4_f, N_C4, C_C4, M_C4, F_C4, E_C4, R_C4, S_C4, H_C4, W_C4, U_C4); //6을가지고 conv 하여 ofmap을 초기화
-	bias_f(ofmap, ofmap, bias4_f, N_C4, M_C4, E_C4, F_C4); //생성된 ofmap을 bias타게함 최종적으로 ofmap 추출
-
-	//printf("%f", ofmap.size());
 	free(ofmap1); //할당한 메모리 비워주기
 	free(ofmap2);
 	free(ofmap3);
 	free(ofmap4);
 	free(ofmap5);
-	free(ofmap6);
 }
 /*
 void cnn_opt(short *ofmap, short *ifmap, int data_set){
@@ -238,7 +234,7 @@ int main(void) {
 			if(mode_sel == 0){
 				ifmap_f = (float *)calloc(H_C1*W_C1*C_C1*N_C1,sizeof(float)); //메모리 동적할당
 				//"in" float크기를 가진 변수를 H_C1*W_C1*C_C1*N_C1(28*28*1*1) 개만큼 저장할 수 있는 메모리 공간을 할당
-				ofmap_f = (float *)calloc(E_C4*F_C4*M_C4*N_C4,sizeof(float));
+				ofmap_f = (float *)calloc(E_C3*F_C3*M_C3*N_C3,sizeof(float));
 				//"out" (1*1*10*1)
 
 				
@@ -263,21 +259,21 @@ int main(void) {
 				//12/10 분석완료
 				max_val_f = ofmap_f[0];
 				data_index = 0;
-				for (n = 0; n<N_C4; n++) { //1
-					for (m = 0; m<M_C4; m++) { //10 - 열개 (0~9) 비교하면서 가장 높은 값이 즉 그 m이 추출될거
-						for (e = 0; e<E_C4; e++) { //1
-							for (f = 0; f<F_C4; f++) { //1
+				for (n = 0; n<N_C3; n++) { //1
+					for (m = 0; m<M_C3; m++) { //10 - 열개 (0~9) 비교하면서 가장 높은 값이 즉 그 m이 추출될거
+						for (e = 0; e<E_C3; e++) { //1
+							for (f = 0; f<F_C3; f++) { //1
 
 								//data_set=0 data_index=0~9
-								printf("%d\n ", ((n * M_C4 + m) * E_C4 + f) * F_C4 + e);
-								printf("%f\n ", ofmap_f[((n * M_C4 + m) * E_C4 + f) * F_C4 + e]);
-								ofmap_ref[data_set][data_index] = ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e];
+								printf("%d\n ", ((n * M_C3 + m) * E_C3 + f) * F_C3 + e);
+								printf("%f\n ", ofmap_f[((n * M_C3 + m) * E_C3 + f) * F_C3 + e]);
+								ofmap_ref[data_set][data_index] = ofmap_f[((n*M_C3 + m)*E_C3 + f)*F_C3 + e];
 								printf("%f\n ", ofmap_ref[data_set][data_index]);
 								//this
 								//printf("ofmap_ref[%d][%d] : %d\n", data_set, data_index, ofmap_ref[data_set][data_index]);
 
-								if (ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e] >= max_val_f) { //추론결과가 max_val_f보다 크면 = 일치율이 높다면
-									max_val_f = ofmap_f[((n*M_C4 + m)*E_C4 + f)*F_C4 + e]; //max_val_f를 갱신해준다.
+								if (ofmap_f[((n*M_C3 + m)*E_C3 + f)*F_C3 + e] >= max_val_f) { //추론결과가 max_val_f보다 크면 = 일치율이 높다면
+									max_val_f = ofmap_f[((n*M_C3 + m)*E_C3 + f)*F_C3 + e]; //max_val_f를 갱신해준다.
 									estimated_label = m; //그때의 m이 estimated_label이 될것
 									//printf("max_val_f: %d, estimated_label: %d\n", max_val_f, estimated_label);
 								}
