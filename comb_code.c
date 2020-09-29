@@ -44,7 +44,6 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	float* ofmap3 = (float*)calloc(E_C2 * F_C2 * M_C2 * N_C2, sizeof(float));
 	float* ofmap4 = (float*)calloc(E_R1 * F_R1 * M_R1 * N_R1, sizeof(float));
 	float* ofmap5 = (float*)calloc(E_P2 * F_P2 * C_P2 * N_P2, sizeof(float));
-	float* ofmap6 = (float*)calloc();
 
 	//Input mapping
 	for (i = 0; i<H_C1*W_C1; i++) { //inputsize 28*28만큼.
@@ -65,12 +64,15 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	pool_f(ofmap5, ofmap4, E_C2, F_C2, M_C2);
 
 	/////////////////////////////
-	//         Layer #3       // reshape를 위한 Layer
+	//         Layer #3       //
 	////////////////////////////
-	convolution_f(ofmap6, ofmap5, fmap3_f, N_C3, C_C3, M_C3, F_C3, E_C3, R_C3, S_C3, H_C3, W_C3, U_C3); // W3 사용
 
-	fullyconnected(ofmap, ofmap6, fmap4_f, ); //W4를 사용하여 fullyconnected를 만들어준다.
-	bias_f(ofmap, ofmap, bias1_f, N_C3, M_C3, E_C3, F_C3); // 이후 bias를 더해주어 가설 완성
+	//ofmap5은 언제나 flatten하다. -> W3와 ofmap5를 그대로 matmul -> ofmap에 bias
+	//W3 = (5*5*50) * 10 형태 ofmap5는 곧 ifmap으로 1 * (5*5*50)의 형태
+	//출력인 ofmap은  1*10으로 나올것이다
+	matmul(ofmap, ofmap5, fmap3_f, N_M1, T_M1);
+
+	bias_f(ofmap, ofmap, bias1_f, N_C3, M_C3, E_C3, F_C3); 
 	//ofmap은 10의 크기로 출력될것이다.
 
 	free(ofmap1); //할당한 메모리 비워주기
@@ -78,7 +80,6 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	free(ofmap3);
 	free(ofmap4);
 	free(ofmap5);
-	free(ofmap6);
 }
 /*
 void cnn_opt(short *ofmap, short *ifmap, int data_set){

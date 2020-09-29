@@ -32,13 +32,13 @@ Revision History
 *******************************************************************************/
 //
 #define _mode  1
-#define _data  1 //0¸¸ Ãâ·ÂÇÒ°Å¸é 1·ÎµÖµµµÈ´Ù
-#define _class 10 //mnist ¼ıÀÚ´Ï±ñ 10°³ÀÇ Ãâ·ÂÀ» ³ªÅ¸³»°ÔµÈ´Ù.
+#define _data  1 //0ë§Œ ì¶œë ¥í• ê±°ë©´ 1ë¡œë‘¬ë„ëœë‹¤
+#define _class 10 //mnist ìˆ«ìë‹ˆê¹ 10ê°œì˜ ì¶œë ¥ì„ ë‚˜íƒ€ë‚´ê²Œëœë‹¤.
 #define SCALE  15
 
 //Convlayer #1 parameter
 #define N_C1 1 
-#define M_C1 20 // filter °¹¼ö
+#define M_C1 20 // filter ê°¯ìˆ˜
 #define C_C1 1
 #define E_C1 24 // output size
 #define F_C1 24 // output size
@@ -50,7 +50,7 @@ Revision History
 
 //Pool #1 parameter
 #define N_P1 1
-#define E_P1 12 //Á÷Á¢¾²´Â°Ô ¾Æ´Ñ ¸Ş¸ğ¸®ÇÒ´çÀ» À§ÇÑ ¹Ì¸®°è»ê
+#define E_P1 12 //ì§ì ‘ì“°ëŠ”ê²Œ ì•„ë‹Œ ë©”ëª¨ë¦¬í• ë‹¹ì„ ìœ„í•œ ë¯¸ë¦¬ê³„ì‚°
 #define F_P1 12
 #define C_P1 20 
 #define M_P1 20
@@ -99,3 +99,6 @@ Revision History
 #define U_R1 1
 
 
+//Matmul #1 parameter
+#define N_M1 10
+#define T_M1 1250
