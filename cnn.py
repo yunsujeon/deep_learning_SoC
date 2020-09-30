@@ -525,8 +525,9 @@ Y = tf.placeholder(tf.float32, [None, 10])  # output
 ######################필터수를 줄인 레이어구성################################
 # layer 1
 W1 = tf.Variable(tf.random_normal([5, 5, 1, 20], stddev=0.1))  # 3*3크기의 필터, 색상은 단일, 총 32개의 필터
-L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='VALID')  # conv2d 를 통과해도 28*28 크기를 가짐, 대신 32개의 필터이므로 총 32개의 결과가 생김
-L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')  # max pooling을 하고 나면 스트라이드 및 패딩 설정에 의해 14*14크기의 결과가 나옴
+L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='VALID')
+L100 = L1
+L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
 
 # layer 2
 W2 = tf.Variable(tf.random_normal([3, 3, 20, 50], stddev=0.1))
@@ -552,7 +553,7 @@ optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
 sess = tf.InteractiveSession()
 sess.run(tf.global_variables_initializer())
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-training_epochs = 15
+training_epochs = 1
 batch_size = 100
 
 # training
@@ -576,43 +577,44 @@ correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.arg_max(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 print('Accuracy:', sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels}))
 
-with open('C:/Users/dbstn/Desktop/bias.txt', 'w') as f:
-  for a in range(10):
-    b_out = sess.run(b[a])
-    b_out = (str(b_out) + ', ')
-    f.write(str(b_out))
-    print ( "bias추출을 ", a+1 , "번 완료했습니다.")
-
-count1 = 0
-count2 = 0
-count3 = 0
-with open('C:/Users/dbstn/Desktop/W1.txt', 'w') as f:
-  for a in range(5):
-    for b in range(5):
-      for c in range(1):
-        for d in range(20):
-          w_out1 = sess.run(W1[a][b][c][d])
-          w_out1 = (str(w_out1)+', ')
-          f.write(str(w_out1))
-          count1 = count1 +1
-          print("W1추출을 ",count1, "/500 번 완료했습니다.")
-
-with open('C:/Users/dbstn/Desktop/W2.txt', 'w') as f:
-  for a in range(3):
-    for b in range(3):
-      for c in range(20):
-        for d in range(50):
-          w_out2 = sess.run(W2[a][b][c][d])
-          w_out2 = (str(w_out2)+', ')
-          f.write(str(w_out2))
-          count2 = count2 +1
-          print("W2추출을 ", count2, "/9000 번 완료했습니다.")
-
-with open('C:/Users/dbstn/Desktop/W3.txt', 'w') as f:
-  for a in range(1250):
-    for b in range(10):
-      w_out3 = sess.run(W3[a][b])
-      w_out3 = (str(w_out3)+', ')
-      f.write(str(w_out3))
-      count3 = count3 +1
-      print("W3추출을 ", count3, "/12500 번 완료했습니다.")
+    # with open('C:/Users/dbstn/Desktop/bias.txt', 'w') as f:
+#   for a in range(10):
+#     b_out = sess.run(b[a])
+#     b_out = (str(b_out) + ', ')
+#     f.write(str(b_out))
+#     print ( "bias추출을 ", a+1 , "번 완료했습니다.")
+#
+# count1 = 0
+# count2 = 0
+# count3 = 0
+#
+# with open('C:/Users/dbstn/Desktop/W1.txt', 'w') as f:
+#   for a in range(5):
+#     for b in range(5):
+#       for c in range(1):
+#         for d in range(20):
+#           w_out1 = sess.run(W1[a][b][c][d])
+#           w_out1 = (str(w_out1)+', ')
+#           f.write(str(w_out1))
+#           count1 = count1 +1
+#           print("W1추출을 ",count1, "/500 번 완료했습니다.")
+#
+# with open('C:/Users/dbstn/Desktop/W2.txt', 'w') as f:
+#   for a in range(3):
+#     for b in range(3):
+#       for c in range(20):
+#         for d in range(50):
+#           w_out2 = sess.run(W2[a][b][c][d])
+#           w_out2 = (str(w_out2)+', ')
+#           f.write(str(w_out2))
+#           count2 = count2 +1
+#           print("W2추출을 ", count2, "/9000 번 완료했습니다.")
+#
+# with open('C:/Users/dbstn/Desktop/W3.txt', 'w') as f:
+#   for a in range(1250):
+#     for b in range(10):
+#       w_out3 = sess.run(W3[a][b])
+#       w_out3 = (str(w_out3)+', ')
+#       f.write(str(w_out3))
+#       count3 = count3 +1
+#       print("W3추출을 ", count3, "/12500 번 완료했습니다.")

@@ -35,15 +35,15 @@ unsigned int validator_dummy(unsigned int uiParam0, unsigned int uiParam1, unsig
 	return 1;
 }
 
-
+//ofmap_f(10크기) ifmap_f(784크기)
 void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	int i = 0;
-
-	float* ofmap1 = (float*)calloc(E_C1 * F_C1 * M_C1 * N_C1, sizeof(float));
-	float* ofmap2 = (float*)calloc(E_P1 * F_P1 * C_P1 * N_P1, sizeof(float));
-	float* ofmap3 = (float*)calloc(E_C2 * F_C2 * M_C2 * N_C2, sizeof(float));
-	float* ofmap4 = (float*)calloc(E_R1 * F_R1 * M_R1 * N_R1, sizeof(float));
-	float* ofmap5 = (float*)calloc(E_P2 * F_P2 * C_P2 * N_P2, sizeof(float));
+	
+	float* ofmap1 = (float*)calloc(E_C1 * F_C1 * M_C1 * N_C1, sizeof(float)); //24*24*20*1 = 11520
+	float* ofmap2 = (float*)calloc(E_P1 * F_P1 * C_P1 * N_P1, sizeof(float)); //12*12*20*1 = 2880
+	float* ofmap3 = (float*)calloc(E_C2 * F_C2 * M_C2 * N_C2, sizeof(float)); //10*10*50*1 = 5000
+	float* ofmap4 = (float*)calloc(E_R1 * F_R1 * M_R1 * N_R1, sizeof(float)); //10*10*50*1 = 5000
+	float* ofmap5 = (float*)calloc(E_P2 * F_P2 * C_P2 * N_P2, sizeof(float)); //5*5*50*1 = 1250
 
 	//Input mapping
 	for (i = 0; i<H_C1*W_C1; i++) { //inputsize 28*28만큼.
@@ -80,6 +80,7 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	free(ofmap3);
 	free(ofmap4);
 	free(ofmap5);
+	
 }
 /*
 void cnn_opt(short *ofmap, short *ifmap, int data_set){
@@ -230,10 +231,8 @@ int main(void) {
 		for (data_set = 0; data_set<_data; data_set++){ //현재 하나만 인식할것이므로 파라미터에서 _data를 1로뒀다. 한번만 하겠다는거
 			
 			if(mode_sel == 0){
-				ifmap_f = (float *)calloc(H_C1*W_C1*C_C1*N_C1,sizeof(float)); //메모리 동적할당
-				//"in" float크기를 가진 변수를 H_C1*W_C1*C_C1*N_C1(28*28*1*1) 개만큼 저장할 수 있는 메모리 공간을 할당
-				ofmap_f = (float *)calloc(E_C3*F_C3*M_C3*N_C3,sizeof(float));
-				//"out" (1*1*10*1)
+				ifmap_f = (float *)calloc(H_C1*W_C1*C_C1*N_C1,sizeof(float)); // 784
+				ofmap_f = (float *)calloc(E_C3*F_C3*M_C3*N_C3,sizeof(float)); // 10
 
 				
 				cnn_ref(ofmap_f, ifmap_f, data_set); //oout in 시작번지 갖고들어감 data_set은 한번만 할거니깐 0번지
