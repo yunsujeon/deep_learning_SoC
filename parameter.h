@@ -36,6 +36,7 @@ Revision History
 #define _class 10 //mnist 숫자니깐 10개의 출력을 나타내게된다.
 #define SCALE  15
 
+/*
 //Convlayer #1 parameter
 #define N_C1 1 
 #define M_C1 20 // filter 갯수
@@ -98,7 +99,7 @@ Revision History
 #define W_R1 4
 #define U_R1 1
 
-
+*/
 //Matmul #1 parameter
 #define N_M1 10
 #define T_M1 1250

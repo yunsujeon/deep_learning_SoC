@@ -1,4 +1,4 @@
-
+/*
 void relu_f(float *ofmap, float *ifmap, int E, int F, int C)
 {
 	int c = 0, e = 0, f = 0;
@@ -57,6 +57,37 @@ void convolution_f(float *ofmap, float *ifmap, float *fmap, unsigned int N, unsi
 		}
 	}
 }
+*/
+
+void bias_f(float* ofmap, float* ifmap, float* bias, unsigned int N, unsigned int M, unsigned int E, unsigned int F)
+{
+	unsigned int n = 0, m = 0, e = 0, f = 0, num = 0;
+
+	for (m = 0; m < M; m++) { //filter 갯수 10
+		ofmap[m] = ifmap[m] + bias[m]; //bias를 더해준다
+	} 
+}
+
+
+void matmul(float* ofmap, float* ifmap, float* fmap, unsigned int N, unsigned int T) {
+	unsigned int n = 0, t = 0;
+	float buf = 0.0;
+	int count = 0;
+	for (n = 0; n < N; n++) { //0-9까지증가
+		for (t = 0; t < T; t++) { //0-783까지 증가
+			buf = ifmap[t] * fmap[(count%T)*N+(count/T)] + buf;
+			count += 1;
+		}
+		ofmap[n] = buf;
+		buf = 0.0;
+	}
+}
+
+
+
+
+
+
 /*
 void bias_f(float *ofmap, float *ifmap, float *bias, unsigned int N, unsigned int M, unsigned int E, unsigned int F)
 {
@@ -72,26 +103,3 @@ void bias_f(float *ofmap, float *ifmap, float *bias, unsigned int N, unsigned in
 					num ++;
 }
 */
-void bias_f(float* ofmap, float* ifmap, float* bias, unsigned int N, unsigned int M, unsigned int E, unsigned int F)
-{
-	unsigned int n = 0, m = 0, e = 0, f = 0, num = 0;
-
-	for (m = 0; m < M; m++) { //filter 갯수 10
-		ofmap[m] = ifmap[m] + bias[m]; //bias를 더해준다
-	} 
-}
-
-
-void matmul(float* ofmap, float* ifmap, float* fmap, unsigned int N, unsigned int T) {
-	unsigned int n = 0, t = 0;
-	float buf = 0.0;
-
-	for (n = 0; n < N; n++) { //10까지증가
-		for (t = 0; t < T; t++) { //1250까지증가
-			buf = ifmap[t] * fmap[(n*T)+t] + buf;
-		}
-		ofmap[n] = buf;
-		buf = 0.0;
-	}
-}
-

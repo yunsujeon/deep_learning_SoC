@@ -35,7 +35,18 @@ unsigned int validator_dummy(unsigned int uiParam0, unsigned int uiParam1, unsig
 	return 1;
 }
 
-//ofmap_f(10크기) ifmap_f(784크기)
+void cnn_ref(float* ofmap, float* ifmap, int data_set) {
+	int i = 0;
+
+	for (i = 0; i < 784; i++) { //inputsize 28*28만큼.
+		ifmap[i] = data[data_set][i]; //ifmap을 초기화시켜준다. data[0][i++] 로. 즉 입력된 숫자를 하나하나 불러오겠다는거
+	}
+	matmul(ofmap, ifmap, fmap1_f, N_M1, 784);
+	bias_f(ofmap, ofmap, bias1_f, 1, 10, 1, 1);
+	//ofmap은 10의 크기로 출력될것이다.
+}
+
+/*
 void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	int i = 0;
 	
@@ -81,7 +92,9 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	free(ofmap4);
 	free(ofmap5);
 	
-}
+}*/
+
+
 /*
 void cnn_opt(short *ofmap, short *ifmap, int data_set){
 	///////////////////////////////////////////////////////////////
@@ -220,6 +233,72 @@ int main(void) {
 /////                   START                        /////
 //////////////////////////////////////////////////////////
 
+	
+	for (mode_sel = 0; mode_sel < _mode; mode_sel++) { // mode_sel = 0 (SW), mode_sel = 1 (HW)
+
+		printf("\r\n");
+		if (mode_sel == 0)
+			printf("Case 0: Reference \r\n"); //레퍼런스
+		else
+			printf("Case 1: Optimization \r\n"); //최적화
+
+		for (data_set = 0; data_set < _data; data_set++) { //현재 하나만 인식할것이므로 파라미터에서 _data를 1로뒀다. 한번만 하겠다는거
+
+			if (mode_sel == 0) {
+				ifmap_f = (float*)calloc(784, sizeof(float)); // 784
+				ofmap_f = (float*)calloc(10, sizeof(float)); // 10
+
+
+				cnn_ref(ofmap_f, ifmap_f, data_set); //oout in 시작번지 갖고들어감 data_set은 한번만 할거니깐 0번지
+				//ofmap_f 계산 완료하여 사용가능
+
+
+				/////////////////////////////
+				//     Classifiacation     //
+				////////////////////////////
+				for (int i = 0; i < 784; i++) {
+					printf("%.3f ", data[data_set][i]);
+					if (i % 28 == 27)
+						printf("\n");
+				}
+
+				for (int i = 0; i < 10; i++) {
+					printf("%f ", ofmap_f[i]);
+				}
+
+				//printf("%f", ofmap_f.size());
+				max_val_f = ofmap_f[0];
+				data_index = 0;
+				for (n = 0; n <1 ; n++) { //1
+					for (m = 0; m < 10; m++) { //10 - 열개 (0~9) 비교하면서 가장 높은 값이 즉 그 m이 추출될거
+						for (e = 0; e < 1; e++) { //1
+							for (f = 0; f <1; f++) { //1
+
+								//data_set=0 data_index=0~9
+								printf("%d\n ", m);
+								printf("%f\n ", ofmap_f[m]);
+								ofmap_ref[data_set][data_index] = ofmap_f[m];
+								printf("%f\n ", ofmap_ref[data_set][data_index]);
+								//this
+								//printf("ofmap_ref[%d][%d] : %d\n", data_set, data_index, ofmap_ref[data_set][data_index]);
+
+								if (ofmap_f[m] >= max_val_f) { //추론결과가 max_val_f보다 크면 = 일치율이 높다면
+									max_val_f = ofmap_f[m]; //max_val_f를 갱신해준다.
+									estimated_label = m; //그때의 m이 estimated_label이 될것
+									//printf("max_val_f: %d, estimated_label: %d\n", max_val_f, estimated_label);
+								}
+								data_index++;
+							}
+						}
+					}
+				}
+				printf("estimated label: %d (%f) \r\n", estimated_label, max_val_f); //추정
+				free(ifmap_f);
+				free(ofmap_f); //메모리를 비워준다.
+			}
+
+
+	/*
 	for (mode_sel = 0; mode_sel< _mode; mode_sel++) { // mode_sel = 0 (SW), mode_sel = 1 (HW)
 
 		printf("\r\n");
@@ -283,6 +362,12 @@ int main(void) {
 				free(ifmap_f);
 				free(ofmap_f); //메모리를 비워준다.
 			}
+			*/
+
+
+
+
+
 			/*
 			else{  //if (mode_sel == 1)
 				ifmap   = (short *)calloc(H_C1*W_C1*C_C1*N_C1,sizeof(short));
@@ -337,4 +422,3 @@ int main(void) {
 			//printf("Measure performance: NSR(dB) = %0.3f \r\n", NSRdB);
 	}
 } //mode_sel
-	//printf("END!!!!!");
