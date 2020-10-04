@@ -35,18 +35,6 @@ unsigned int validator_dummy(unsigned int uiParam0, unsigned int uiParam1, unsig
 	return 1;
 }
 
-void cnn_ref(float* ofmap, float* ifmap, int data_set) {
-	int i = 0;
-
-	for (i = 0; i < 784; i++) { //inputsize 28*28만큼.
-		ifmap[i] = data[data_set][i]; //ifmap을 초기화시켜준다. data[0][i++] 로. 즉 입력된 숫자를 하나하나 불러오겠다는거
-	}
-	matmul(ofmap, ifmap, fmap1_f, N_M1, 784);
-	bias_f(ofmap, ofmap, bias1_f, 1, 10, 1, 1);
-	//ofmap은 10의 크기로 출력될것이다.
-}
-
-/*
 void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	int i = 0;
 	
@@ -64,13 +52,13 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	/////////////////////////////
 	//         Layer #1       //
 	////////////////////////////
-	convolution_f(ofmap1, ifmap, fmap1_f, N_C1, C_C1, M_C1, F_C1, E_C1, R_C1, S_C1, H_C1, W_C1, U_C1); // W1 사용
+	convolution_f(ofmap1, ifmap, fmap1_f, R_C1, S_C1, C_C1, E_C1, F_C1, M_C1, H_C1, W_C1); // W1 사용
 	pool_f(ofmap2, ofmap1, E_C1, F_C1, M_C1); 
 
 	/////////////////////////////
 	//         Layer #2       //
 	////////////////////////////
-	convolution_f(ofmap3, ofmap2, fmap2_f, N_C2, C_C2, M_C2, F_C2, E_C2, R_C2, S_C2, H_C2, W_C2, U_C2); // W2 사용
+	convolution_f(ofmap3, ofmap2, fmap2_f, R_C2, S_C2, C_C2, E_C2, F_C2, M_C2, H_C2, W_C2); // W2 사용
 	relu_f(ofmap4, ofmap3, E_C2, F_C2, M_C2); 
 	pool_f(ofmap5, ofmap4, E_C2, F_C2, M_C2);
 
@@ -92,7 +80,7 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	free(ofmap4);
 	free(ofmap5);
 	
-}*/
+}
 
 
 /*

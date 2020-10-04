@@ -36,17 +36,16 @@ Revision History
 #define _class 10 //mnist 숫자니깐 10개의 출력을 나타내게된다.
 #define SCALE  15
 
-/*
 //Convlayer #1 parameter
 #define N_C1 1 
-#define M_C1 20 // filter 갯수
-#define C_C1 1
-#define E_C1 24 // output size
-#define F_C1 24 // output size
-#define R_C1 5  // filter size
-#define S_C1 5  // filter size
-#define H_C1 28 // input size
-#define W_C1 28 // input size
+#define M_C1 20 // 필터갯수
+#define C_C1 1 //필터 두께
+#define E_C1 24 // 출력사이즈
+#define F_C1 24 // 출력사이즈
+#define R_C1 5  // 필터사이즈
+#define S_C1 5  // 필터사이즈
+#define H_C1 28 // 입력사이즈
+#define W_C1 28 // 입력사이즈
 #define U_C1 1
 
 //Pool #1 parameter
@@ -56,16 +55,16 @@ Revision History
 #define C_P1 20 
 #define M_P1 20
 
-//Convlaye #2 parameter
+//Convlayer #2 parameter
 #define N_C2 1
-#define M_C2 50
-#define C_C2 20
-#define E_C2 10
-#define F_C2 10
-#define R_C2 3
-#define S_C2 3
-#define H_C2 12
-#define W_C2 12
+#define M_C2 50 //필터갯수
+#define C_C2 20 //필터 두께
+#define E_C2 10 //출력사이즈
+#define F_C2 10 //출력사이즈
+#define R_C2 3 //필터사이즈
+#define S_C2 3 //필터사이즈
+#define H_C2 12 //입력사이즈
+#define W_C2 12 //입력사이즈
 #define U_C2 1
 
 //Pool #2 parameter
@@ -99,7 +98,7 @@ Revision History
 #define W_R1 4
 #define U_R1 1
 
-*/
+
 //Matmul #1 parameter
 #define N_M1 10
 #define T_M1 1250

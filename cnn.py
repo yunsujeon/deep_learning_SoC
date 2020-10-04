@@ -1,6 +1,4 @@
-#
 # import tensorflow as tf
-#
 # #---------------------------------------------------------------------------------------------------- 1. MNIST 데이터를 가져옵니다.
 # # MNIST 데이터 관련 내용은 다음 포스팅 참고
 # #
@@ -27,7 +25,6 @@
 # # x 이미지 데이터 입력 -> 플레이스홀더
 # y_model = tf.matmul(x, W) + b #행렬 곱연산과 bias 더해주기
 #
-#
 # #---------------------------------------------------------------------------------------------------- 3. loss와 optimizer를 정의합니다.
 # y = tf.placeholder(tf.float32, [None, 10])  # 크기 10인 MNIST의 라벨 데이터 (숫자가 열개니깐)
 #
@@ -44,15 +41,12 @@
 # optimizer = tf.train.GradientDescentOptimizer(0.01).minimize(cost) # learning_rate = 0.01
 #
 #
-#
 # #---------------------------------------------------------------------------------------------------- 4. 훈련을 위한 세션 시작
 # sess = tf.Session()
 #
-#
 # sess.run(tf.global_variables_initializer()) # 변수 초기화
 #
-#
-# for epoch in range(25): # 훈련을 25번 반복
+# for epoch in range(50): # 훈련을 25번 반복
 #     avg_cost = 0.
 #
 #     # 1번 훈련시 전체 훈련 데이터를 사용하려면 100개씩 몇번 가져와야 하는지 계산하여 반복
@@ -71,16 +65,31 @@
 #     # 훈련 1번 끝날때 마다 중간 결과를 출력
 #     print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost))
 #
-#
 # print("최적화 완료")
 #
-# # with open('C:/Users/dbstn/Desktop/weight_data.txt', 'w') as f:
-# #     for i in range(784):
-# #         for j in range(10):
-# #             w_out = sess.run(W[i][j])
-# #             w_out = round(w_out, 4)
-# #             f.write(str(w_out)+',')
-# #         print(i)
+# count = 0
+# count1 = 0
+#
+# with open('C:/Users/dbstn/Desktop/B.txt', 'w') as f:
+#   for a in range(10):
+#     b_out = sess.run(b[a])
+#     b_out = (str(b_out)+', ')
+#     f.write(str(b_out))
+#     count1 = count1 + 1
+#     print("B추출을 ", count1, "/10 번 완료했습니다.")
+#
+# wo1 = []
+# wo1 = [0]*120000 #크기 할당
+# with open('C:/Users/dbstn/Desktop/W.txt', 'w') as f:
+#   for a in range(784):
+#     for b in range(10):
+#       w_out = sess.run(W[a][b])
+#       w_out = (str(w_out)+', ')
+#       wo1[(count1%10)*784+(count1//10)]=w_out
+#       count = count +1
+#       print("W추출을 ", count1, "/7840 번 완료했습니다.")
+#     for c in range(7480):
+#         f.write(str(wo1[c]))
 #
 # #---------------------------------------------------------------------------------------------------- 5. 정확도 측정
 # # 라벨값 y와 모델로 계산된 값 y_model이 똑같이 같은 인덱스가 제일 크다고 하는지 검사
@@ -103,6 +112,8 @@
 # print("Accuracy:", sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels}))
 #
 # sess.close()
+
+
 
 
 
@@ -521,12 +532,32 @@ Y = tf.placeholder(tf.float32, [None, 10])  # output
 # b = tf.Variable(tf.random_normal([10]))
 # hypothesis = tf.matmul(L2, W3) + b
 
+count1 = 0
+count2 = 0
+count3 = 0
 
+wo1 = []
+wo1 = [0]*7500 #메모리할당
+wo2 = []
+wo2 = [0]*125000
+wo3 = []
+wo3 = [0]*187500
+
+###############################출력 test##################################
+# for i in range(500):
+#     wo1[5 * 5 * 1 * (count1 % 20) + (count1 // 20)] = count1
+#     count1 = count1+1
+# for i in range(500):
+#     print(wo1[i])
+# for i in range(9000):
+#     wo2[((count2 % 50) * 180) + (count2 // 1000) + ((count2 // 50) % 20) * 9] = count2
+#     count2 = count2+1
+# for i in range(9000):
+#     print(wo2[i])
 ######################필터수를 줄인 레이어구성################################
 # layer 1
-W1 = tf.Variable(tf.random_normal([5, 5, 1, 20], stddev=0.1))  # 3*3크기의 필터, 색상은 단일, 총 32개의 필터
+W1 = tf.Variable(tf.random_normal([5, 5, 1, 20], stddev=0.1))
 L1 = tf.nn.conv2d(X_img, W1, strides=[1, 1, 1, 1], padding='VALID')
-L100 = L1
 L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='VALID')
 
 # layer 2
@@ -553,19 +584,18 @@ optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
 sess = tf.InteractiveSession()
 sess.run(tf.global_variables_initializer())
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-training_epochs = 1
+training_epochs = 15
 batch_size = 100
 
 # training
 print('Learning started. It takes sometimes.')
-for epoch in range(training_epochs):
+for epoch in range(training_epochs): #15번 학습
   avg_cost = 0
-  total_batch = int(mnist.train.num_examples / batch_size) #mnist.train.num_examples = 55000이고 batch_size=100이니 550개 학습한다보면된다
-  # 1 iteration 마다 100개의 데이터에 대해서 학습한다고 보면된다
-  # 1epoch = 총 데이터갯수 / batchsize = 550일것 = iteration = 550
-  #근데 여기서는 epochs를 정해준듯??? 다시보기
-  for i in range(total_batch):
-    batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+  total_batch = int(mnist.train.num_examples / batch_size)
+  #mnist.train.num_examples = 55000이고 batch_size=100이니 batch의 갯수는 550개 = 1iteration
+  # 1iteration은 550개 이고 한개 batch 학습당 100개 데이터를 학습
+  for i in range(total_batch): # 550. 즉 iteration을 도는것 이 안에서는 100개씩 학습한다.
+    batch_xs, batch_ys = mnist.train.next_batch(batch_size) #batch size만큼 읽는다.
     feed_dict = {X: batch_xs, Y: batch_ys}
     c, _, = sess.run([cost, optimizer], feed_dict=feed_dict)
     avg_cost += c / total_batch
@@ -577,44 +607,48 @@ correct_prediction = tf.equal(tf.argmax(hypothesis, 1), tf.arg_max(Y, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 print('Accuracy:', sess.run(accuracy, feed_dict={X: mnist.test.images, Y: mnist.test.labels}))
 
-    # with open('C:/Users/dbstn/Desktop/bias.txt', 'w') as f:
-#   for a in range(10):
-#     b_out = sess.run(b[a])
-#     b_out = (str(b_out) + ', ')
-#     f.write(str(b_out))
-#     print ( "bias추출을 ", a+1 , "번 완료했습니다.")
-#
-# count1 = 0
-# count2 = 0
-# count3 = 0
-#
-# with open('C:/Users/dbstn/Desktop/W1.txt', 'w') as f:
-#   for a in range(5):
-#     for b in range(5):
-#       for c in range(1):
-#         for d in range(20):
-#           w_out1 = sess.run(W1[a][b][c][d])
-#           w_out1 = (str(w_out1)+', ')
-#           f.write(str(w_out1))
-#           count1 = count1 +1
-#           print("W1추출을 ",count1, "/500 번 완료했습니다.")
-#
-# with open('C:/Users/dbstn/Desktop/W2.txt', 'w') as f:
-#   for a in range(3):
-#     for b in range(3):
-#       for c in range(20):
-#         for d in range(50):
-#           w_out2 = sess.run(W2[a][b][c][d])
-#           w_out2 = (str(w_out2)+', ')
-#           f.write(str(w_out2))
-#           count2 = count2 +1
-#           print("W2추출을 ", count2, "/9000 번 완료했습니다.")
-#
-# with open('C:/Users/dbstn/Desktop/W3.txt', 'w') as f:
-#   for a in range(1250):
-#     for b in range(10):
-#       w_out3 = sess.run(W3[a][b])
-#       w_out3 = (str(w_out3)+', ')
-#       f.write(str(w_out3))
-#       count3 = count3 +1
-#       print("W3추출을 ", count3, "/12500 번 완료했습니다.")
+with open('C:/Users/dbstn/Desktop/bias.txt', 'w') as f:
+  for a in range(10):
+    b_out = sess.run(b[a])
+    b_out = (str(b_out) + ', ')
+    f.write(str(b_out))
+    print ( "bias추출을 ", a+1 , "번 완료했습니다.")
+
+with open('C:/Users/dbstn/Desktop/W1.txt', 'w') as f:
+    for a in range(5):
+        for b in range(5):
+            for c in range(1):
+                for d in range(20):
+                    w_out1 = sess.run(W1[a][b][c][d])
+                    w_out1 = (str(w_out1)+', ')
+                    wo1[5*5*1*(count1%20)+(count1//20)] = w_out1
+                    count1 = count1 +1
+        print("W1추출을 ", count1, "/500 번 완료했습니다.")
+    for e in range(500):
+        f.write(str(wo1[e]))
+
+with open('C:/Users/dbstn/Desktop/W2.txt', 'w') as f:
+    for a in range(3):
+        for b in range(3):
+            for c in range(20):
+                for d in range(50):
+                    w_out2 = sess.run(W2[a][b][c][d])
+                    w_out2 = (str(w_out2)+', ')
+                    wo2[((count2%50)*180)+(count2//1000)+((count2//50)%20)*9] = w_out2
+                    count2 = count2 +1
+                print("W2추출을 ", count2, "/9000 번 완료했습니다.")
+    for e in range(9000):
+        f.write(str(wo2[e]))
+
+with open('C:/Users/dbstn/Desktop/W3.txt', 'w') as f: #matmul을 위한
+    for a in range(1250):
+        for b in range(10):
+            w_out3 = sess.run(W3[a][b])
+            w_out3 = (str(w_out3)+', ')
+            wo3[(count3%10)*1250+(count3//10)]=w_out3
+            count3 = count3 +1
+        print("W3추출을 ", count3, "/12500 번 완료했습니다.")
+    for c in range (12500):
+        f.write(str(wo3[c]))
+
+print("finished")
