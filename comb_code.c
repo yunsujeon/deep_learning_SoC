@@ -38,11 +38,11 @@ unsigned int validator_dummy(unsigned int uiParam0, unsigned int uiParam1, unsig
 void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	int i = 0;
 	
-	float* ofmap1 = (float*)calloc(E_C1 * F_C1 * M_C1 * N_C1, sizeof(float)); //24*24*20*1 = 11520
-	float* ofmap2 = (float*)calloc(E_P1 * F_P1 * C_P1 * N_P1, sizeof(float)); //12*12*20*1 = 2880
-	float* ofmap3 = (float*)calloc(E_C2 * F_C2 * M_C2 * N_C2, sizeof(float)); //10*10*50*1 = 5000
-	float* ofmap4 = (float*)calloc(E_R1 * F_R1 * M_R1 * N_R1, sizeof(float)); //10*10*50*1 = 5000
-	float* ofmap5 = (float*)calloc(E_P2 * F_P2 * C_P2 * N_P2, sizeof(float)); //5*5*50*1 = 1250
+	float* ofmap1 = (float*)calloc(E_C1 * F_C1 * M_C1 * N_C1, sizeof(float)); //
+	float* ofmap2 = (float*)calloc(E_P1 * F_P1 * C_P1 * N_P1, sizeof(float)); //
+	float* ofmap3 = (float*)calloc(E_C2 * F_C2 * M_C2 * N_C2, sizeof(float)); //
+	//float* ofmap4 = (float*)calloc(E_R1 * F_R1 * M_R1 * N_R1, sizeof(float)); //
+	float* ofmap4 = (float*)calloc(E_P2 * F_P2 * C_P2 * N_P2, sizeof(float)); //
 
 	//Input mapping
 	for (i = 0; i<H_C1*W_C1; i++) { //inputsize 28*28만큼.
@@ -59,8 +59,8 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	//         Layer #2       //
 	////////////////////////////
 	convolution_f(ofmap3, ofmap2, fmap2_f, R_C2, S_C2, C_C2, E_C2, F_C2, M_C2, H_C2, W_C2); // W2 사용
-	relu_f(ofmap4, ofmap3, E_C2, F_C2, M_C2); 
-	pool_f(ofmap5, ofmap4, E_C2, F_C2, M_C2);
+	//relu_f(ofmap4, ofmap3, E_C2, F_C2, M_C2); 
+	pool_f(ofmap4, ofmap3, E_C2, F_C2, M_C2);
 
 	/////////////////////////////
 	//         Layer #3       //
@@ -69,7 +69,7 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	//ofmap5은 언제나 flatten하다. -> W3와 ofmap5를 그대로 matmul -> ofmap에 bias
 	//W3 = (5*5*50) * 10 형태 ofmap5는 곧 ifmap으로 1 * (5*5*50)의 형태
 	//출력인 ofmap은  1*10으로 나올것이다
-	matmul(ofmap, ofmap5, fmap3_f, N_M1, T_M1);
+	matmul(ofmap, ofmap4, fmap3_f, N_M1, T_M1);
 
 	bias_f(ofmap, ofmap, bias1_f, N_C3, M_C3, E_C3, F_C3); 
 	//ofmap은 10의 크기로 출력될것이다.
@@ -78,71 +78,9 @@ void cnn_ref(float *ofmap, float *ifmap, int data_set){
 	free(ofmap2);
 	free(ofmap3);
 	free(ofmap4);
-	free(ofmap5);
+	//free(ofmap5);
 	
 }
-
-
-/*
-void cnn_opt(short *ofmap, short *ifmap, int data_set){
-	///////////////////////////////////////////////////////////////
-	// You are allowed to modify only the inside of this function
-	// From this line
-
-	int i = 0;
-
-	short *ofmap1 = (short *) calloc(E_C1*F_C1*M_C1*N_C1, sizeof(short));
-	short *ofmap2 = (short *) calloc(E_P1*F_P1*C_P1*N_P1, sizeof(short));
-	short *ofmap3 = (short *) calloc(E_C2*F_C2*M_C2*N_C2, sizeof(short));
-	short *ofmap4 = (short *) calloc(E_P2*F_P2*C_P2*N_P2, sizeof(short));
-	short *ofmap5 = (short *) calloc(E_C3*F_C3*M_C3*N_C3, sizeof(short));
-	short *ofmap6 = (short *) calloc(E_R1*F_R1*M_R1*N_R1, sizeof(short));
-
-	//Input mapping
-	for (i = 0; i<H_C1*W_C1; i++) {
-		ifmap[i] = (short)(data[data_set][i] * pow(2, SCALE - 1));
-	}
-
-	/////////////////////////////
-	//         Layer #1       //
-	////////////////////////////
-	convolution(ofmap1, ifmap, fmap1, N_C1, C_C1, M_C1, F_C1, E_C1, R_C1, S_C1, H_C1, W_C1, U_C1);
-	bias(ofmap1, ofmap1, bias1, N_C1, M_C1, E_C1, F_C1);
-	pool(ofmap2, ofmap1, E_C1, F_C1, M_C1);
-
-	/////////////////////////////
-	//         Layer #2       //
-	////////////////////////////
-	convolution(ofmap3, ofmap2, fmap2, N_C2, C_C2, M_C2, F_C2, E_C2, R_C2, S_C2, H_C2, W_C2, U_C2);
-	bias(ofmap3, ofmap3, bias2, N_C2, M_C2, E_C2, F_C2);
-	pool(ofmap4, ofmap3, E_C2, F_C2, M_C2);
-
-	/////////////////////////////
-	//         Layer #3       //
-	////////////////////////////
-	convolution(ofmap5, ofmap4, fmap3, N_C3, C_C3, M_C3, F_C3, E_C3, R_C3, S_C3, H_C3, W_C3, U_C3);
-	bias(ofmap5, ofmap5, bias3, N_C3, M_C3, E_C3, F_C3);
-	relu(ofmap6, ofmap5, E_C3, F_C3, M_C3);
-
-	/////////////////////////////
-	//         Layer #4       //
-	////////////////////////////
-	convolution(ofmap, ofmap6, fmap4, N_C4, C_C4, M_C4, F_C4, E_C4, R_C4, S_C4, H_C4, W_C4, U_C4);
-	bias(ofmap, ofmap, bias4, N_C4, M_C4, E_C4, F_C4);
-
-	free(ofmap1);
-	free(ofmap2);
-	free(ofmap3);
-	free(ofmap4);
-	free(ofmap5);
-	free(ofmap6);
-
-	// To this line
-	// You are allowed to modify only the inside of this function
-	///////////////////////////////////////////////////////////////
-}
-*/
-
 
 
 int main(void) {

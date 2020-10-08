@@ -32,6 +32,33 @@ void pool_f(float *ofmap, float *ifmap, int E, int F, int C) //출력사이즈, 출력�
 	}
 }
 
+/*
+void convolution_f(float* ofmap, float* ifmap, float* fmap, unsigned int N, unsigned int C, unsigned int M, unsigned int E, unsigned int F, unsigned int R, unsigned int S, unsigned int H, unsigned int W, unsigned int U)
+{
+	unsigned int n = 0, c = 0, m = 0, f = 0, e = 0, r = 0, s = 0;
+	float buf = 0;
+
+	// Convolution
+	for (n = 0; n < N; n++) { //1
+		for (c = 0; c < C; c++) { //필터 두께 1/20
+			for (m = 0; m < M; m++) { // filter 갯수 20/50
+				for (f = 0; f < F; f++) { // output size 24/10
+					for (e = 0; e < E; e++) { // output size 24/10
+						buf = ofmap[((n * M + m) * E + e) * F + f];
+						for (r = 0; r < R; r++) { // filter size 5/3
+							for (s = 0; s < S; s++) { // filter size 5/3 
+								buf += ifmap[((n * C + c) * H + e * U + r) * W + f * U + s] * fmap[((m * C + c) * R + r) * S + s]; //input과 filter를 conv
+							}
+						}
+						ofmap[((n * M + m) * E + e) * F + f] = buf;
+					}
+				}
+			}
+		}
+	}
+}*/
+
+
 // convolution_f ( x, x, x, R:필터사이즈 S:필터사이즈 C:필터두께 E:출력사이즈 F:출력사이즈 M:필터갯수 H:입력사이즈 W:입력사이즈)
 void convolution_f(float *ofmap, float *ifmap, float *fmap, unsigned int R, unsigned int S, unsigned int C, unsigned int E, unsigned int F, unsigned int M, unsigned H, unsigned int W)
 {
@@ -45,7 +72,7 @@ void convolution_f(float *ofmap, float *ifmap, float *fmap, unsigned int R, unsi
 				for (c = 0; c < C; c++) { //필터두께 1/20
 					for (r = 0; r < R; r++) { //필터사이즈 5/3
 						for (s = 0; s < S; s++) { //필터사이즈 5/3
-							buf = ifmap[s + (H * r) + (H * W * c) + f + (E * e) + (H - E)] * fmap[(m * S * R * C) + (count % (S * R * C))] + buf;
+							buf = ifmap[s + (H * r) + (H * W * c) + f + (H * e)] * fmap[(m * S * R * C) + (count % (S * R * C))] + buf;
 							count = count + 1;
 						}
 					}
