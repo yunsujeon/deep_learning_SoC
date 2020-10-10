@@ -101,4 +101,4 @@ Revision History
 
 //Matmul #1 parameter
 #define N_M1 10
-#define T_M1 1250
+#define T_M1 320
