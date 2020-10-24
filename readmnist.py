@@ -27,7 +27,7 @@ def divideBy256(x):
 def sixformat(x):
     return format(x, ".6f")
 # while True:
-for i in range(100):
+for i in range(101):
     s = fp_image.read(784) #784바이트씩 읽음
     l = fp_label.read(1) #1바이트씩 읽음
 
@@ -46,7 +46,7 @@ for i in range(100):
 
     img = np.reshape(unpack(len(s) * 'B', s), (28, 28))
 
-    with open('C:/Users/dbstn/Desktop/numbers.txt', 'at') as f:
+    with open('C:/Users/dbstn/Desktop/numbers.txt', 'a') as f:
         strr = "\n"
         f.write(index)
         f.write(strr)
@@ -55,4 +55,3 @@ for i in range(100):
         f.close()
 
     print(i+1," 번 반복했습니다")
-    time.sleep(5)
