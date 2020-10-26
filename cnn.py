@@ -1,185 +1,272 @@
-###########################################################   NN (1회)   #############################################################
+#이진 으로 바꾸기
 
-import tensorflow as tf
-import numpy as np
-#---------------------------------------------------------------------------------------------------- 1. MNIST 데이터를 가져옵니다.
+num1 = -0.1701116
+num2 = 0.26553392
+num3 = -0.014648308
+num4 = 0.0
+num5 = -7.125691e-06
+num6 = -0.00028364424
+num7 = 0.00045066405
+num8 = 7.242351368
 
-from tensorflow.examples.tutorials.mnist import input_data
+# num1 = 0.1*0.96
+# num2 = 0.2*0.96
+# num3 = 0.3*0.96
+# num4 = 0.4*0.96
+# num5 = 0.5*0.96
+# num6 = 0.6*0.96
+# num7 = 0.7*0.96
+# num8 = 0.8*0.96
+num9 = 0.9*0.96
 
-mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+#포맷재지정
+num1 = format(num1, ".6f")
+num2 = format(num2, ".6f")
+num3 = format(num3, ".6f")
+num4 = format(num4, ".6f")
+num5 = format(num5, ".6f")
+num6 = format(num6, ".6f")
+num7 = format(num7, ".6f")
+num8 = format(num8, ".6f")
+num9 = format(num9, ".6f")
 
-#---------------------------------------------------------------------------------------------------- 2. 모델을 생성합니다.
-x = tf.placeholder(tf.float32, [None, 784])
+def float_bin(number, places):
+    whole, trash = str(number).split(".")
+    number = float(number)
+    dec = abs(number)
+    whole = int(whole)
+    #dec = int(dec)
+    if (whole==0):
+        res = "0."
+    else:
+        res = bin(whole).lstrip("0b") + "."
 
-# 모델 파라미터
-W = tf.Variable(tf.zeros([784, 10]))
-b = tf.Variable(tf.zeros([10]))
+    for x in range(places):
+        fdec = dec*2
+        fdec = format(fdec, ".6f")
+        whole, dec = fdec.split(".")
+        dec = "0."+dec
+        dec = float(dec)
+        res += whole
+    return res
 
-# softmax를 사용한 모델을 생성
-y_model = tf.matmul(x, W) + b #행렬 곱연산과 bias 더해주기
+# def decimal_converter(num):
+#     while num > 1:
+#         num /= 10
+#     if( num == 0 ):
+#         return 0.0
+#     return num
 
-#---------------------------------------------------------------------------------------------------- 3. loss와 optimizer를 정의합니다.
-y = tf.placeholder(tf.float32, [None, 10])  # 크기 10인 MNIST의 라벨 데이터 (숫자가 열개니깐)
 
-#cost = tf.reduce_mean(-tf.reduce_sum(y*tf.log(tf.nn.softmax(y_model)), reduction_indices=1))
-cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=y, logits=y_model))
 
-# Gradient Descent - Backpropagation 기법으로 최적화
-optimizer = tf.train.GradientDescentOptimizer(0.01).minimize(cost) # learning_rate = 0.01
+p = int(16)
 
-#---------------------------------------------------------------------------------------------------- 4. 훈련을 위한 세션 시작
-sess = tf.Session()
-sess.run(tf.global_variables_initializer()) # 변수 초기화
+num1 = (float_bin(num1, places=p))
+num2 = (float_bin(num2, places=p))
+num3 = (float_bin(num3, places=p))
+num4 = (float_bin(num4, places=p))
+num5 = (float_bin(num5, places=p))
+num6 = (float_bin(num6, places=p))
+num7 = (float_bin(num7, places=p))
+num8 = (float_bin(num8, places=p))
+num9 = (float_bin(num9, places=p))
 
-for epoch in range(35): # 훈련을 35번 반복
-    avg_cost = 0.
+print(num1)
+print(num2)
+print(num3)
+print(num4)
+print(num5)
+print(num6)
+print(num7)
+print(num8)
+print(num9)
 
-    # 1번 훈련시 전체 훈련 데이터를 사용하려면 100개씩 몇번 가져와야 하는지 계산하여 반복
-    total_batch = int(mnist.train.num_examples / 100)
-    for i in range(total_batch):
-        # 전체 훈련 데이터(mnist.train)에서 100개씩 데이터를 가져옵니다.
-        # (100, 784) (100, 10)
-        batch_xs, batch_ys = mnist.train.next_batch(100)
+a=10
+b=10
 
-        # optimizer와 cost 오퍼레이션을 실행합니다.
-        _, c = sess.run([optimizer, cost], feed_dict={x: batch_xs, y: batch_ys})
 
-        # 현재까지 평균 손실(loss)를 누적합니다.
-        avg_cost += c / total_batch
-
-    # 훈련 1번 끝날때 마다 중간 결과를 출력
-    print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost))
-
-print("최적화 완료")
-
-count = 0
-count1 = 0
-
-#---------------------------------------------------------------------------------------------------- 5. 정확도 측정
-# 라벨값 y와 모델로 계산된 값 y_model이 똑같이 같은 인덱스가 제일 크다고 하는지 검사
-# ( tf.argmax 함수가 배열에서 가장 큰 값을 가리키는 인덱스를 리턴합니다.. )
-# 결과적으로 correct_prediction는 True 또는 False 값의 리스트를 가지게 됨
-
-correct_prediction = tf.equal(tf.argmax(y_model, 1), tf.argmax(y, 1))
-
-# tf.cast 함수를 사용하여 True 또는 False를 실수 1 또는 0으로 변환
-# 전체 데이터가 일치한다면 모든 값이 1이며 평균인 accuracy는 1이 되어야 합니다.
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
-# 정확도 측정을 위해서 훈련 데이터(mnist.train) 대신에 별도의 테스트 데이터(mnist.test)를 사용해야 합니다.
-print("Accuracy:", sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels}))
-
-# image_file01 = open("C:/Users/dbstn/Desktop/numdata/num0_x1.txt","r")
-# image_file02 = open("C:/Users/dbstn/Desktop/numdata/num0_x2.txt","r")
-# image_file11 = open("C:/Users/dbstn/Desktop/numdata/num1_o1.txt","r")
-# image_file21 = open("C:/Users/dbstn/Desktop/numdata/num2_o1.txt","r")
-# image_file22 = open("C:/Users/dbstn/Desktop/numdata/num2_o2.txt","r")
-# image_file31 = open("C:/Users/dbstn/Desktop/numdata/num3_o1.txt","r")
-# image_file32 = open("C:/Users/dbstn/Desktop/numdata/num3_o2.txt","r")
-# image_file41 = open("C:/Users/dbstn/Desktop/numdata/num4_o1.txt","r")
-# image_file42 = open("C:/Users/dbstn/Desktop/numdata/num4_o2.txt","r")
-# image_file51 = open("C:/Users/dbstn/Desktop/numdata/num5_o1.txt","r")
-# image_file52 = open("C:/Users/dbstn/Desktop/numdata/num5_o2.txt","r")
-# image_file61 = open("C:/Users/dbstn/Desktop/numdata/num6_o1.txt","r")
-# image_file62 = open("C:/Users/dbstn/Desktop/numdata/num6_o2.txt","r")
-# image_file71 = open("C:/Users/dbstn/Desktop/numdata/num7_x1.txt","r")
-# image_file81 = open("C:/Users/dbstn/Desktop/numdata/num8_o1.txt","r")
-# image_file91 = open("C:/Users/dbstn/Desktop/numdata/num9_o1.txt","r")
+# ###########################################################   NN (1회)   #############################################################
 #
-# image01 = image_file01.read().split(', ')
-# image02 = image_file02.read().split(', ')
-# image11 = image_file11.read().split(', ')
-# image21 = image_file21.read().split(', ')
-# image22 = image_file22.read().split(', ')
-# image31 = image_file31.read().split(', ')
-# image32 = image_file32.read().split(', ')
-# image41 = image_file41.read().split(', ')
-# image42 = image_file42.read().split(', ')
-# image51 = image_file51.read().split(', ')
-# image52 = image_file52.read().split(', ')
-# image61 = image_file61.read().split(', ')
-# image62 = image_file62.read().split(', ')
-# image71 = image_file71.read().split(', ')
-# image81 = image_file81.read().split(', ')
-# image91 = image_file91.read().split(', ')
+# import tensorflow as tf
+# import numpy as np
+# #---------------------------------------------------------------------------------------------------- 1. MNIST 데이터를 가져옵니다.
 #
-# image01 = list(map(float, image01))
-# image02 = list(map(float, image02))
-# image11 = list(map(float, image11))
-# image21 = list(map(float, image21))
-# image22 = list(map(float, image22))
-# image31 = list(map(float, image31))
-# image32 = list(map(float, image32))
-# image41 = list(map(float, image41))
-# image42 = list(map(float, image42))
-# image51 = list(map(float, image51))
-# image52 = list(map(float, image52))
-# image61 = list(map(float, image61))
-# image62 = list(map(float, image62))
-# image71 = list(map(float, image71))
-# image81 = list(map(float, image81))
-# image91 = list(map(float, image91))
+# from tensorflow.examples.tutorials.mnist import input_data
 #
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image01]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image02]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image11]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image21]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image22]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image31]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image32]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image41]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image42]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image51]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image52]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image61]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image62]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image71]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image81]}))
-# print('Neural Network predicted', classification[0])
-# classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image91]}))
-# print('Neural Network predicted', classification[0])
-
-
-with open('C:/Users/dbstn/Desktop/B.txt', 'w') as f:
-  for a in range(10):
-    b_out = sess.run(b[a]) #b_out 은 -0.014648308 과 같은것
-    # 이걸 특정 자리수에서 반올림연산을 하자
-    b_out=round(b_out,6)
-    b_out = (str(b_out)+', ')
-    f.write(str(b_out))
-    count1 = count1 + 1
-    print("B추출을 ", count1, "/10 번 완료했습니다.")
-
-wo1 = []
-wo1 = [0.000000]*120000 #크기 할당
-
-with open('C:/Users/dbstn/Desktop/W.txt', 'w') as f:
-  for a in range(784):
-    for b in range(10):
-      w_out = sess.run(W[a][b])
-      w_out = round(w_out, 6)
-      w_out = (str(w_out)+', ')
-      wo1[(count1%10)*784+(count1//10)]=w_out
-      count = count +1
-      print("W추출을 ", count1, "/7840 번 완료했습니다.")
-    for c in range(7480):
-        f.write(str(wo1[c]))
-
-sess.close()
+# mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+#
+# #---------------------------------------------------------------------------------------------------- 2. 모델을 생성합니다.
+# x = tf.placeholder(tf.float32, [None, 784])
+#
+# # 모델 파라미터
+# W = tf.Variable(tf.zeros([784, 10]))
+# b = tf.Variable(tf.zeros([10]))
+#
+# # softmax를 사용한 모델을 생성
+# y_model = tf.matmul(x, W) + b #행렬 곱연산과 bias 더해주기
+#
+# #---------------------------------------------------------------------------------------------------- 3. loss와 optimizer를 정의합니다.
+# y = tf.placeholder(tf.float32, [None, 10])  # 크기 10인 MNIST의 라벨 데이터 (숫자가 열개니깐)
+#
+# #cost = tf.reduce_mean(-tf.reduce_sum(y*tf.log(tf.nn.softmax(y_model)), reduction_indices=1))
+# cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=y, logits=y_model))
+#
+# # Gradient Descent - Backpropagation 기법으로 최적화
+# optimizer = tf.train.GradientDescentOptimizer(0.01).minimize(cost) # learning_rate = 0.01
+#
+# #---------------------------------------------------------------------------------------------------- 4. 훈련을 위한 세션 시작
+# sess = tf.Session()
+# sess.run(tf.global_variables_initializer()) # 변수 초기화
+#
+# for epoch in range(35): # 훈련을 35번 반복
+#     avg_cost = 0.
+#
+#     # 1번 훈련시 전체 훈련 데이터를 사용하려면 100개씩 몇번 가져와야 하는지 계산하여 반복
+#     total_batch = int(mnist.train.num_examples / 100)
+#     for i in range(total_batch):
+#         # 전체 훈련 데이터(mnist.train)에서 100개씩 데이터를 가져옵니다.
+#         # (100, 784) (100, 10)
+#         batch_xs, batch_ys = mnist.train.next_batch(100)
+#
+#         # optimizer와 cost 오퍼레이션을 실행합니다.
+#         _, c = sess.run([optimizer, cost], feed_dict={x: batch_xs, y: batch_ys})
+#
+#         # 현재까지 평균 손실(loss)를 누적합니다.
+#         avg_cost += c / total_batch
+#
+#     # 훈련 1번 끝날때 마다 중간 결과를 출력
+#     print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost))
+#
+# print("최적화 완료")
+#
+# count = 0
+# count1 = 0
+#
+# #---------------------------------------------------------------------------------------------------- 5. 정확도 측정
+# # 라벨값 y와 모델로 계산된 값 y_model이 똑같이 같은 인덱스가 제일 크다고 하는지 검사
+# # ( tf.argmax 함수가 배열에서 가장 큰 값을 가리키는 인덱스를 리턴합니다.. )
+# # 결과적으로 correct_prediction는 True 또는 False 값의 리스트를 가지게 됨
+#
+# correct_prediction = tf.equal(tf.argmax(y_model, 1), tf.argmax(y, 1))
+#
+# # tf.cast 함수를 사용하여 True 또는 False를 실수 1 또는 0으로 변환
+# # 전체 데이터가 일치한다면 모든 값이 1이며 평균인 accuracy는 1이 되어야 합니다.
+# accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+#
+# # 정확도 측정을 위해서 훈련 데이터(mnist.train) 대신에 별도의 테스트 데이터(mnist.test)를 사용해야 합니다.
+# print("Accuracy:", sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels}))
+#
+# # image_file01 = open("C:/Users/dbstn/Desktop/numdata/num0_x1.txt","r")
+# # image_file02 = open("C:/Users/dbstn/Desktop/numdata/num0_x2.txt","r")
+# # image_file11 = open("C:/Users/dbstn/Desktop/numdata/num1_o1.txt","r")
+# # image_file21 = open("C:/Users/dbstn/Desktop/numdata/num2_o1.txt","r")
+# # image_file22 = open("C:/Users/dbstn/Desktop/numdata/num2_o2.txt","r")
+# # image_file31 = open("C:/Users/dbstn/Desktop/numdata/num3_o1.txt","r")
+# # image_file32 = open("C:/Users/dbstn/Desktop/numdata/num3_o2.txt","r")
+# # image_file41 = open("C:/Users/dbstn/Desktop/numdata/num4_o1.txt","r")
+# # image_file42 = open("C:/Users/dbstn/Desktop/numdata/num4_o2.txt","r")
+# # image_file51 = open("C:/Users/dbstn/Desktop/numdata/num5_o1.txt","r")
+# # image_file52 = open("C:/Users/dbstn/Desktop/numdata/num5_o2.txt","r")
+# # image_file61 = open("C:/Users/dbstn/Desktop/numdata/num6_o1.txt","r")
+# # image_file62 = open("C:/Users/dbstn/Desktop/numdata/num6_o2.txt","r")
+# # image_file71 = open("C:/Users/dbstn/Desktop/numdata/num7_x1.txt","r")
+# # image_file81 = open("C:/Users/dbstn/Desktop/numdata/num8_o1.txt","r")
+# # image_file91 = open("C:/Users/dbstn/Desktop/numdata/num9_o1.txt","r")
+# #
+# # image01 = image_file01.read().split(', ')
+# # image02 = image_file02.read().split(', ')
+# # image11 = image_file11.read().split(', ')
+# # image21 = image_file21.read().split(', ')
+# # image22 = image_file22.read().split(', ')
+# # image31 = image_file31.read().split(', ')
+# # image32 = image_file32.read().split(', ')
+# # image41 = image_file41.read().split(', ')
+# # image42 = image_file42.read().split(', ')
+# # image51 = image_file51.read().split(', ')
+# # image52 = image_file52.read().split(', ')
+# # image61 = image_file61.read().split(', ')
+# # image62 = image_file62.read().split(', ')
+# # image71 = image_file71.read().split(', ')
+# # image81 = image_file81.read().split(', ')
+# # image91 = image_file91.read().split(', ')
+# #
+# # image01 = list(map(float, image01))
+# # image02 = list(map(float, image02))
+# # image11 = list(map(float, image11))
+# # image21 = list(map(float, image21))
+# # image22 = list(map(float, image22))
+# # image31 = list(map(float, image31))
+# # image32 = list(map(float, image32))
+# # image41 = list(map(float, image41))
+# # image42 = list(map(float, image42))
+# # image51 = list(map(float, image51))
+# # image52 = list(map(float, image52))
+# # image61 = list(map(float, image61))
+# # image62 = list(map(float, image62))
+# # image71 = list(map(float, image71))
+# # image81 = list(map(float, image81))
+# # image91 = list(map(float, image91))
+# #
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image01]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image02]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image11]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image21]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image22]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image31]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image32]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image41]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image42]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image51]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image52]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image61]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image62]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image71]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image81]}))
+# # print('Neural Network predicted', classification[0])
+# # classification = (sess.run(tf.argmax(y_model, 1), feed_dict={x : [image91]}))
+# # print('Neural Network predicted', classification[0])
+#
+#
+# with open('C:/Users/dbstn/Desktop/B.txt', 'w') as f:
+#   for a in range(10):
+#     b_out = sess.run(b[a]) #b_out 은 -0.014648308 과 같은것
+#     #포맷을 바꾸자
+#     b_out = format(b_out, "7.6f")
+#     b_out = (str(b_out)+', ')
+#     f.write(str(b_out))
+#     count1 = count1 + 1
+#     print("B추출을 ", count1, "/10 번 완료했습니다.")
+#
+# wo1 = []
+# wo1 = [0.000000]*120000 #크기 할당
+#
+# with open('C:/Users/dbstn/Desktop/W.txt', 'w') as f:
+#   for a in range(784):
+#     for b in range(10):
+#       w_out = sess.run(W[a][b])
+#       w_out = format(w_out, "7.6f")
+#       w_out = (str(w_out)+', ')
+#       wo1[(count1%10)*784+(count1//10)]=w_out
+#       count = count +1
+#       print("W추출을 ", count1, "/7840 번 완료했습니다.")
+#     for c in range(7480):
+#         f.write(str(wo1[c]))
+#
+# sess.close()
 
 
 
