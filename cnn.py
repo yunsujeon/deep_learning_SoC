@@ -88,72 +88,39 @@
 ###########################################################   NN (1회)   #############################################################
 
 import tensorflow as tf
-import numpy as np
-#---------------------------------------------------------------------------------------------------- 1. MNIST 데이터를 가져옵니다.
-
 from tensorflow.examples.tutorials.mnist import input_data
 
 mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
-#---------------------------------------------------------------------------------------------------- 2. 모델을 생성합니다.
 x = tf.placeholder(tf.float32, [None, 784])
-
-# 모델 파라미터
 W = tf.Variable(tf.zeros([784, 10]))
 b = tf.Variable(tf.zeros([10]))
-
-# softmax를 사용한 모델을 생성
 y_model = tf.matmul(x, W) + b #행렬 곱연산과 bias 더해주기
 
-#---------------------------------------------------------------------------------------------------- 3. loss와 optimizer를 정의합니다.
 y = tf.placeholder(tf.float32, [None, 10])  # 크기 10인 MNIST의 라벨 데이터 (숫자가 열개니깐)
-
 #cost = tf.reduce_mean(-tf.reduce_sum(y*tf.log(tf.nn.softmax(y_model)), reduction_indices=1))
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels=y, logits=y_model))
 
-# Gradient Descent - Backpropagation 기법으로 최적화
 optimizer = tf.train.GradientDescentOptimizer(0.01).minimize(cost) # learning_rate = 0.01
 
-#---------------------------------------------------------------------------------------------------- 4. 훈련을 위한 세션 시작
 sess = tf.Session()
 sess.run(tf.global_variables_initializer()) # 변수 초기화
 
 for epoch in range(35): # 훈련을 35번 반복
     avg_cost = 0.
-
-    # 1번 훈련시 전체 훈련 데이터를 사용하려면 100개씩 몇번 가져와야 하는지 계산하여 반복
     total_batch = int(mnist.train.num_examples / 100)
     for i in range(total_batch):
-        # 전체 훈련 데이터(mnist.train)에서 100개씩 데이터를 가져옵니다.
-        # (100, 784) (100, 10)
         batch_xs, batch_ys = mnist.train.next_batch(100)
-
-        # optimizer와 cost 오퍼레이션을 실행합니다.
         _, c = sess.run([optimizer, cost], feed_dict={x: batch_xs, y: batch_ys})
-
-        # 현재까지 평균 손실(loss)를 누적합니다.
         avg_cost += c / total_batch
-
-    # 훈련 1번 끝날때 마다 중간 결과를 출력
     print("Epoch:", '%04d' % (epoch+1), "cost=", "{:.9f}".format(avg_cost))
-
 print("최적화 완료")
 
 count = 0
 count1 = 0
 
-#---------------------------------------------------------------------------------------------------- 5. 정확도 측정
-# 라벨값 y와 모델로 계산된 값 y_model이 똑같이 같은 인덱스가 제일 크다고 하는지 검사
-# ( tf.argmax 함수가 배열에서 가장 큰 값을 가리키는 인덱스를 리턴합니다.. )
-# 결과적으로 correct_prediction는 True 또는 False 값의 리스트를 가지게 됨
-
 correct_prediction = tf.equal(tf.argmax(y_model, 1), tf.argmax(y, 1))
-
-# tf.cast 함수를 사용하여 True 또는 False를 실수 1 또는 0으로 변환
-# 전체 데이터가 일치한다면 모든 값이 1이며 평균인 accuracy는 1이 되어야 합니다.
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-
-# 정확도 측정을 위해서 훈련 데이터(mnist.train) 대신에 별도의 테스트 데이터(mnist.test)를 사용해야 합니다.
 print("Accuracy:", sess.run(accuracy, feed_dict={x: mnist.test.images, y: mnist.test.labels}))
 
 # image_file01 = open("C:/Users/dbstn/Desktop/numdata/num0_x1.txt","r")
@@ -268,7 +235,12 @@ with open('C:/Users/dbstn/Desktop/W.txt', 'w') as f:
             count1 = count1 +1
             print("W추출을 ", count1, "/7840 번 완료했습니다.")
     for c in range(7480):
-        f.write(str(wo1[c]))
+        if( c == 0 or c == 1*748 or c == 2*748 or c == 3*748 or c == 4*748 or c == 5*748 or c == 6*748 or c == 7*748 or c == 8*748 or c == 9*748):
+            f.write("}")
+            f.write("{")
+            f.write(str(wo1[c]))
+        else :
+            f.write(str(wo1[c]))
         print("W입력을 ", count1, "/7840 번 완료했습니다.")
 
 sess.close()
