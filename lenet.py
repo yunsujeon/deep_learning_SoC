@@ -1,4 +1,4 @@
-#
+# 샘플코드와 동일하게 채널을 구성후 텐서 순서대로 뽑은코드
 # import tensorflow as tf
 # import matplotlib.pyplot as plt
 # import random
